@@ -6,33 +6,35 @@ import { TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
 import nom from '../assets/nom.png'
 import logo from '../assets/logo.png';
-import { AppLoading } from "expo-app-loading";
-import {
-    useFonts,
-    MontserratAlternates_400Regular,
-  } from "@expo-google-fonts/dev";
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
+import * as Font from 'expo-font';
 
-export default function Welcome() {
+Font.loadAsync({
+  // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
+  // 'regular':require('../assets/fonts/MontserratAlternates-Regular.ttf'),
+  'medium':require('../assets/fonts/MontserratAlternates-Medium.ttf'),
+  // 'bold':require('../assets/fonts/MontserratAlternates-Bold.ttf'),
+});
 
-    let [fontsLoaded] = useFonts({
-        MontserratAlternates_400Regular
-    
-      });
+export default function Welcome({navigation}) {
 
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  } else {
     return (
         <View style={styles.container}>
 
         <Image source={logo} style={styles.logo} />
     
              <Text style={styles.header}>let's play</Text>
-             <Text style={styles.header2}>some tag</Text>
+             <Text style={styles.header2}>some tag!</Text>
+
+<TouchableOpacity onPress={()=> navigation.replace("Login")}>
+   <Image source={nom} style={styles.nom}></Image>
+</TouchableOpacity>
+
+
+             <Text style={styles.swipe}>tap to get started</Text>
          </View>
     );
-  }
 }
 
 const styles = StyleSheet.create({
@@ -49,8 +51,27 @@ const styles = StyleSheet.create({
       },
       header:{
           color:'#fff',
-          fontFamily:'MontserratAlternates',
+          fontFamily:'medium',
           fontSize:50,
+          marginTop:150
+      },
+      header2:{
+          color:'#fff',
+          fontFamily:'medium',
+          fontSize:50,
+          marginTop:10,
+          marginLeft:40
+      },nom:{
+        width: 500,
+        height:700,
+        marginLeft:-80,
+      },swipe:{
+        color:'#fff',
+        fontFamily:'medium',
+        fontSize:20,
+        marginTop:-340,
+        width:'100%',
+        textAlign:'center'
       }
     
 });
