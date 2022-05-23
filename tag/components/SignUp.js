@@ -1,6 +1,10 @@
 import React,{useState} from 'react';
-import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import logo from '../assets/logo2.png';
+
+//firebase
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../Firebase';
 
 import * as Font from 'expo-font';
 
@@ -11,11 +15,33 @@ Font.loadAsync({
     'semiBold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
   });
 
-export default function Login({navigation}) {
+export default function SignUp({navigation}) {
 
     const [username, onUsernameChange]=useState("");
     const [email, onEmailChange]=useState("");
     const [password, onPasswordChange]=useState("");
+
+    //button handleLoginPress
+    const handleLoginPress = () =>{
+
+        // setLoading(true);
+        // Alert.alert(email+"with password" + password+"logged in" + username)
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredentials) =>{
+                //when successful
+                const user = userCredentials.user;
+                Alert.alert(user.uid);
+
+                //to do: add user to DB
+                
+                navigation.replace("Permissions");
+            })
+            .catch((error)=>{
+                //when failed
+                Alert.alert(error.message);
+            })
+
+    }
 
   return (
     <View style={styles.container}>
@@ -53,7 +79,10 @@ export default function Login({navigation}) {
              secureTextEntry={true}
             />
 {/* //TODo - make this clickable and navigate - add authentication */}
-        <View style={styles.loginButton}><Text style={styles.loginTxt}>Let's play!</Text></View>
+        <TouchableOpacity onPress={handleLoginPress}>
+               <View style={styles.loginButton}><Text style={styles.loginTxt}>Let's play!</Text></View>
+        </TouchableOpacity>
+     
 
         <TouchableOpacity onPress={()=> navigation.replace("Login")}>
              <View style={styles.signup}><Text style={styles.signupTxt}>Login</Text></View>

@@ -1,6 +1,10 @@
 import React,{useState} from 'react';
-import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import logo from '../assets/logo2.png';
+
+// linking your firebase
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../Firebase';
 
 import * as Font from 'expo-font';
 
@@ -13,9 +17,24 @@ Font.loadAsync({
 
 export default function Login({navigation}) {
 
-    const [username, onUsernameChange]=useState("");
+    const [email, onEmailChange]=useState("");
     const [password, onPasswordChange]=useState("");
 
+    // when pressing the login button
+    const handleLoginPress = () =>{
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredentials) =>{
+            //when successful
+            const user = userCredentials.user;
+            Alert.alert(user.uid);
+
+            navigation.replace("Permissions");
+        })
+        .catch((error)=>{
+            //when failed
+            Alert.alert(error.message);
+        })
+    }
   return (
     <View style={styles.container}>
         <View> 
@@ -29,9 +48,9 @@ export default function Login({navigation}) {
 
             <TextInput
              style={styles.input}
-             value={username}
-             onChangeText={onUsernameChange}
-             placeholder='Username'
+             value={email}
+             onChangeText={onEmailChange}
+             placeholder='Email'
              placeholderTextColor='#000'
             />
              <TextInput
@@ -43,7 +62,10 @@ export default function Login({navigation}) {
              secureTextEntry={true}
             />
 {/* //TODo - make this clickable and navigate - add authentication */}
-        <View style={styles.loginButton}><Text style={styles.loginTxt}>Login</Text></View>
+        <TouchableOpacity onPress={handleLoginPress}>
+                <View style={styles.loginButton}><Text style={styles.loginTxt}>Login</Text></View>
+        </TouchableOpacity>
+    
 
         <TouchableOpacity onPress={()=> navigation.replace("SignUp")}>
              <View style={styles.signup}><Text style={styles.signupTxt}>I'm New</Text></View>
