@@ -6,7 +6,7 @@ import { TouchableOpacity } from 'react-native';
 import { Image } from 'react-native';
 import nom from '../assets/nom.png'
 import logo from '../assets/logo.png';
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+// import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
 import * as Font from 'expo-font';
 

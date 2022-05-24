@@ -18,6 +18,7 @@ import Welcome from './components/Welcome';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Permissions from './components/Permissions';
+import Home from './components/Home';
 
 
 export default function App() {
@@ -41,21 +42,24 @@ if(user){
 return unsubscribe;
 },[]);
 
-  //to do: make pages not accessible if not logged in
+  //to do: make pages not accessible if not logged in - fix this
 
   return (
     <NavigationContainer style={styles.container}>
       <Stack.Navigator initialRouteName='Welcome'>
-      {loggedIn ?(
-      
-        <Stack.Screen name="Permissions" component ={Permissions} options={{headerShown:false}}/>
-      ):(
+      {/* {loggedIn ?( */}
         <>
-        <Stack.Screen name="Welcome" component ={Welcome} options={{headerShown:false}}/>
-        <Stack.Screen name="Login" component ={Login} options={{headerShown:false}}/>
-        <Stack.Screen name="SignUp" component ={SignUp} options={{headerShown:false}}/>
+              <Stack.Screen name="Permissions" component ={Permissions} options={{headerShown:false}}/>
         </>
-      )}
+
+      {/* ):( */}
+        <>
+           <Stack.Screen name="Welcome" component ={Welcome} options={{headerShown:false}}/>
+          <Stack.Screen name="Login" component ={Login} options={{headerShown:false}}/>
+          <Stack.Screen name="SignUp" component ={SignUp} options={{headerShown:false}}/>
+          <Stack.Screen name="Home" component ={Home} options={{headerShown:false}}/>
+        </>
+      {/* )} */}
       </Stack.Navigator>
     </NavigationContainer>
   );

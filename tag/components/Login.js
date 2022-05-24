@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
 
 // linking your firebase
@@ -22,6 +22,9 @@ export default function Login({navigation}) {
 
     // when pressing the login button
     const handleLoginPress = () =>{
+
+        Keyboard.dismiss();
+
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredentials) =>{
             //when successful
@@ -46,7 +49,10 @@ export default function Login({navigation}) {
             <Image source={logo} style={styles.logo} />
             <Text style={styles.header}>Welcome back to tag!</Text>
 
-            <TextInput
+            <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding":"height"}
+        style={styles.writeTaskWrapper}>
+                        <TextInput
              style={styles.input}
              value={email}
              onChangeText={onEmailChange}
@@ -61,6 +67,8 @@ export default function Login({navigation}) {
              placeholderTextColor='#000'
              secureTextEntry={true}
             />
+
+        </KeyboardAvoidingView>
 {/* //TODo - make this clickable and navigate - add authentication */}
         <TouchableOpacity onPress={handleLoginPress}>
                 <View style={styles.loginButton}><Text style={styles.loginTxt}>Login</Text></View>
