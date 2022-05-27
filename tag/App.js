@@ -19,6 +19,10 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Permissions from './components/Permissions';
 import Home from './components/Home';
+import Tag from './components/Tag';
+import Powerup from './components/Powerup';
+import Join from './components/Join';
+import Waiting from './components/Waiting';
 
 
 export default function App() {
@@ -45,6 +49,8 @@ return unsubscribe;
   //to do: make pages not accessible if not logged in - fix this
 
   return (
+    // <Powerup/>
+    // <Tag/>
     <NavigationContainer style={styles.container}>
       <Stack.Navigator initialRouteName='Welcome'>
       {/* {loggedIn ?( */}
@@ -58,6 +64,8 @@ return unsubscribe;
           <Stack.Screen name="Login" component ={Login} options={{headerShown:false}}/>
           <Stack.Screen name="SignUp" component ={SignUp} options={{headerShown:false}}/>
           <Stack.Screen name="Home" component ={Home} options={{headerShown:false}}/>
+          <Stack.Screen name="Join" component ={Join} options={{headerShown:false}}/>
+          <Stack.Screen name="Waiting" component ={Waiting} options={{headerShown:false}}/>
         </>
       {/* )} */}
       </Stack.Navigator>

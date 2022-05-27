@@ -17,7 +17,7 @@ Font.loadAsync({
   'semibold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
 });
 
-export default function Home() {
+export default function Home({navigation}) {
 
   return (
     <ScrollView style={styles.container}>
@@ -37,10 +37,10 @@ export default function Home() {
         </View>
 
 {/* yellow circle */}
-        <View style={styles.join}>
+        <TouchableOpacity style={styles.join} onPress={()=> navigation.navigate("Join")}>
             <Text style={styles.join1}>join</Text>
             <Text style={styles.join2}>next game</Text>
-        </View>
+        </TouchableOpacity>
 
 {/* orange shape */}
         <View style={styles.block}>
