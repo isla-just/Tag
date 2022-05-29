@@ -71,7 +71,7 @@ export default function Home({navigation}) {
      
         </View>
 
-        <TouchableOpacity style={styles.btn}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Leaderboard")}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
 
         <Text style={styles.section}>Your game stats</Text>
 
