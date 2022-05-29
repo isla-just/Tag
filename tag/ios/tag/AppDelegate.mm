@@ -17,7 +17,6 @@
 #import <ReactCommon/RCTTurboModuleManager.h>
 
 #import <react/config/ReactNativeConfig.h>
-#import <GoogleMaps/GoogleMaps.h>
 
 @interface AppDelegate () <RCTCxxBridgeDelegate, RCTTurboModuleManagerDelegate> {
   RCTTurboModuleManager *_turboModuleManager;
@@ -32,8 +31,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [GMSServices provideAPIKey:@"AIzaSyD2hlqCwej7_5AGGEXYbkmvX6kDCcTn6L4"]; // add this line using the api key obtained from Google Console
-
   RCTAppSetupPrepareApp(application);
 
   RCTBridge *bridge = [self.reactDelegate createBridgeWithDelegate:self launchOptions:launchOptions];
