@@ -23,6 +23,8 @@ import Tag from './components/Tag';
 import Powerup from './components/Powerup';
 import Join from './components/Join';
 import Waiting from './components/Waiting';
+import PowerupDetail from './components/PowerupDetail';
+import Leaderboard from './components/Leaderboard';
 
 
 export default function App() {
@@ -49,27 +51,31 @@ return unsubscribe;
   //to do: make pages not accessible if not logged in - fix this
 
   return (
-    // <Powerup/>
-    <Tag/>
-    // <NavigationContainer style={styles.container}>
-    //   <Stack.Navigator initialRouteName='Welcome'>
-    //   {/* {loggedIn ?( */}
-    //     <>
-    //           <Stack.Screen name="Permissions" component ={Permissions} options={{headerShown:false}}/>
-    //     </>
+    // <PowerupDetail/>
+    // <Tag/>
+    <NavigationContainer style={styles.container}>
+      <Stack.Navigator initialRouteName='Welcome'>
+      {/* {loggedIn ?( */}
+        <>
+              <Stack.Screen name="Permissions" component ={Permissions} options={{headerShown:false}}/>
+        </>
 
-    //   {/* ):( */}
-    //     <>
-    //        <Stack.Screen name="Welcome" component ={Welcome} options={{headerShown:false}}/>
-    //       <Stack.Screen name="Login" component ={Login} options={{headerShown:false}}/>
-    //       <Stack.Screen name="SignUp" component ={SignUp} options={{headerShown:false}}/>
-    //       <Stack.Screen name="Home" component ={Home} options={{headerShown:false}}/>
-    //       <Stack.Screen name="Join" component ={Join} options={{headerShown:false}}/>
-    //       <Stack.Screen name="Waiting" component ={Waiting} options={{headerShown:false}}/>
-    //     </>
-    //   {/* )} */}
-    //   </Stack.Navigator>
-    // </NavigationContainer>
+      {/* ):( */}
+        <>
+           <Stack.Screen name="Welcome" component ={Welcome} options={{headerShown:false}}/>
+          <Stack.Screen name="Login" component ={Login} options={{headerShown:false}}/>
+          <Stack.Screen name="SignUp" component ={SignUp} options={{headerShown:false}}/>
+          <Stack.Screen name="Home" component ={Home} options={{headerShown:false}}/>
+          <Stack.Screen name="Join" component ={Join} options={{headerShown:false}}/>
+          <Stack.Screen name="Waiting" component ={Waiting} options={{headerShown:false}}/>
+          <Stack.Screen name="Tag" component ={Tag} options={{headerShown:false}}/>
+          <Stack.Screen name="Powerup" component ={Powerup} options={{headerShown:false}}/>
+          <Stack.Screen name="PowerupDetail" component ={PowerupDetail} options={{headerShown:false}}/>
+          <Stack.Screen name="Leaderboard" component ={Leaderboard} options={{headerShown:false}}/>
+        </>
+      {/* )} */}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

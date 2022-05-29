@@ -5,6 +5,7 @@ import logo from '../assets/logo2.png';
 //firebase
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../Firebase';
+import { createUserOnRegister } from '../services/Database';
 
 import * as Font from 'expo-font';
 
@@ -30,7 +31,7 @@ export default function SignUp({navigation}) {
             .then((userCredentials) =>{
                 //when successful
                 const user = userCredentials.user;
-                Alert.alert(user.uid);
+                createUserOnRegister(user, username)
 
                 //to do: add user to DB
                 

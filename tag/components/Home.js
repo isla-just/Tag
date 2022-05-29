@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import logo from '../assets/logo.png';
 import express from '../assets/expression.png';
@@ -7,6 +7,8 @@ import avatar from '../assets/avatar.png';
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
+
+import { getAllCompetitions } from '../services/Database';
 
 import * as Font from 'expo-font';
 
@@ -18,6 +20,20 @@ Font.loadAsync({
 });
 
 export default function Home({navigation}) {
+
+    const [competitions, setCompetitions]=useState([]);
+
+
+
+    useEffect(()=>{
+        fetchAllCompetitions();
+      },[]);
+    
+      const fetchAllCompetitions = async()=>{
+        const data = await getAllCompetitions();
+        console.log(data);
+        setCompetitions(data);
+      }
 
   return (
     <ScrollView style={styles.container}>
@@ -43,10 +59,11 @@ export default function Home({navigation}) {
         </TouchableOpacity>
 
 {/* orange shape */}
-        <View style={styles.block}>
+        <TouchableOpacity onPress={()=> navigation.navigate("Powerup")}
+         style={styles.block}>
             <Text style={styles.block1}>tag blocker</Text>
             <Text style={styles.block2}>12:10:45</Text>
-        </View>
+        </TouchableOpacity>
 
         <Image source={express} style={styles.express} />
 
@@ -71,7 +88,7 @@ export default function Home({navigation}) {
      
         </View>
 
-        <TouchableOpacity style={styles.btn}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Leaderboard")}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
 
         <Text style={styles.section}>Your game stats</Text>
 

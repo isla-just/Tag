@@ -20,9 +20,9 @@ export default function Tag() {
           <Text style={styles.header}>Tag you’re it!</Text>
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
 
-          <View style={styles.mapContainer}>
+
           <MapView
-         style={{ flex: 1 }}
+         style={styles.mapContainer}
          provider={PROVIDER_GOOGLE}
          showsUserLocation={true}  
          followUserLocation={true}
@@ -32,8 +32,10 @@ export default function Tag() {
          latitudeDelta: 0.0922,
          longitudeDelta: 0.0421}}
 
+         //need to set initial region to your current region
+
       />
-          </View>
+
 
           <TouchableOpacity style={styles.btn}><Text style={styles.btnTxt}>Tag selected person</Text></TouchableOpacity>
     </View>
@@ -73,10 +75,10 @@ const styles = StyleSheet.create({
      height:520,
      backgroundColor: '#FFFBEB',
 marginTop:50,
-borderTopRightRadius:50,
-borderTopLeftRadius:50,
-borderWidth:4,
-borderColor:'#FB5E1B'
+borderRadius:50,
+overflow:'hidden',
+// borderWidth:4,
+// borderColor:'#FB5E1B'
  },btn:{
     width:'90%',
     padding:20,
