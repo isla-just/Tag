@@ -1,7 +1,13 @@
 import React,{useState, useEffect} from 'react';
-import { StyleSheet, Platform, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import logo from '../assets/logo.png';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+import avatar from '../assets/avatar.png';
+
+import leaderboard1 from '../assets/leaderboard1.png';
+import leaderboard2 from '../assets/leaderboard2.png';
+import leaderboard3 from '../assets/leaderboard3.png';
 
 import * as Font from 'expo-font';
 
@@ -12,7 +18,66 @@ Font.loadAsync({
   'semibold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
 });
 
-export default function Tag() {
+const Tag = ({navigation})=> {
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const [loading, setLoading]=useState(true);
+
+  const tokyoRegion = {
+    latitude: -26.028729549982025,
+    longitude: 28.099804136853543,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      setDetails();
+    })();
+  }, []);
+
+
+
+  //checnge this to useeffet for dynamic location
+  const [myLocation, setMyLocation] = useState({});
+  const [text, setText] = useState('Waiting..');
+  const [text2, setText2] = useState('Waiting..');
+
+  const setDetails=()=>{
+    if (errorMsg) {
+      setText(errorMsg);
+      setText2(errorMsg);
+    } else if (location) {
+  
+       setMyLocation( {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      }) 
+  
+      setLoading(false);
+  
+      setText(location.coords.latitude);
+      setText2(location.coords.longitude);
+      // text = JSON.stringify(location);
+      // console.log(text);
+      // console.log(text2);
+    }
+  }
+
 
   return (
     <View style={styles.container}>
@@ -20,27 +85,43 @@ export default function Tag() {
           <Text style={styles.header}>Tag you’re it!</Text>
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
 
+          <Text style={styles.paragraph}>{text}</Text>
+          <Text style={styles.paragraph}>{text2}</Text>
 
+          { loading ?  
+    (
+     <ActivityIndicator /> //will render while loading
+    ) : (
+    
           <MapView
          style={styles.mapContainer}
          provider={PROVIDER_GOOGLE}
          showsUserLocation={true}  
          followUserLocation={true}
-         initialRegion={{
-         latitude: 37.78825,
-         longitude: -122.4324,
-         latitudeDelta: 0.0922,
-         longitudeDelta: 0.0421}}
-
+        //  zoomEnabled={true}  
+        //  zoomControlEnabled={true}  
+         region={myLocation}
          //need to set initial region to your current region
 
-      />
+      >
+{/* 
+        //i would have a map to loop through all the current active locations */}
+          <Marker coordinate={myLocation} 
+           image={avatar}
+          />
+  
+              <Marker coordinate={tokyoRegion}  image={leaderboard1}/>
+      </MapView>
+
+) }
 
 
-          <TouchableOpacity style={styles.btn}><Text style={styles.btnTxt}>Tag selected person</Text></TouchableOpacity>
+          <TouchableOpacity onPress={()=> navigation.navigate("Home")}style={styles.btn}><Text style={styles.btnTxt}>Tag selected person</Text></TouchableOpacity>
     </View>
   );
 }
+
+export default Tag;
 
 const styles = StyleSheet.create({
  

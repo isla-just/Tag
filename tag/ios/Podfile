@@ -1,49 +1,98 @@
-require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
-require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
-require File.join(File.dirname(`node --print "require.resolve('@react-native-community/cli-platform-ios/package.json')"`), "native_modules")
-
-require 'json'
-podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {}
-
-platform :ios, podfile_properties['ios.deploymentTarget'] || '12.0'
-install! 'cocoapods',
-  :deterministic_uuids => false
-
+# Uncomment the next line to define a global platform for your project
+platform :ios, '9.0'
 target 'tag' do
-  use_expo_modules!
-  config = use_native_modules!
-
-  use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
-
-  # Flags change depending on the env values.
-  flags = get_default_flags()
-
-  use_react_native!(
-    :path => config[:reactNativePath],
-    :hermes_enabled => flags[:hermes_enabled] || podfile_properties['expo.jsEngine'] == 'hermes',
-    :fabric_enabled => flags[:fabric_enabled],
-    # An absolute path to your application root.
-    :app_path => "#{Dir.pwd}/.."
-  )
-
-  # Uncomment to opt-in to using Flipper
-  # Note that if you have use_frameworks! enabled, Flipper will not work
-  #
-  # if !ENV['CI']
-  #   use_flipper!()
-  # end
-
+  rn_path = '../node_modules/react-native'
+  rn_maps_path = '../node_modules/react-native-maps'
+  # See http://facebook.github.io/react-native/docs/integration-with-existing-apps.html#configuring-cocoapods-dependencies
+  pod 'yoga', path: "#{rn_path}/ReactCommon/yoga/yoga.podspec"
+  pod 'React', path: rn_path, subspecs: [
+      'Core',
+      'CxxBridge',
+      'DevSupport',
+      'RCTActionSheet',
+      'RCTAnimation',
+      'RCTGeolocation',
+      'RCTImage',
+      'RCTLinkingIOS',
+      'RCTNetwork',
+      'RCTSettings',
+      'RCTText',
+      'RCTVibration',
+      'RCTWebSocket',
+  ]
+  # React Native third party dependencies podspecs
+  pod 'DoubleConversion', :podspec => "#{rn_path}/third-party-podspecs/DoubleConversion.podspec"
+  pod 'glog', :podspec => "#{rn_path}/third-party-podspecs/glog.podspec"
+  # If you are using React Native <0.54, you will get the following error:
+  # "The name of the given podspec `GLog` doesn't match the expected one `glog`"
+  # Use the following line instead:
+  #pod 'GLog', :podspec => "#{rn_path}/third-party-podspecs/GLog.podspec"
+  pod 'Folly', :podspec => "#{rn_path}/third-party-podspecs/Folly.podspec"
+  # react-native-maps dependencies
+  pod 'react-native-maps', path: rn_maps_path
+  pod 'react-native-google-maps', path: rn_maps_path  # Uncomment this line if you want to support GoogleMaps on iOS
+  pod 'GoogleMaps'  # Uncomment this line if you want to support GoogleMaps on iOS
+  pod 'Google-Maps-iOS-Utils' # Uncomment this line if you want to support GoogleMaps on iOS
+  end
   post_install do |installer|
-    react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+      installer.pods_project.targets.each do |target|
+         if target.name == 'react-native-google-maps'
+             target.build_configurations.each do |config|
+             config.build_settings['CLANG_ENABLE_MODULES'] = 'No'
+          end
+      end
+          if target.name == "React"
+            target.remove_from_project
+          end
+       end
   end
 
-  post_integrate do |installer|
-    begin
-      expo_patch_react_imports!(installer)
-    rescue => e
-      Pod::UI.warn e
-    end
-  end
+# require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+# require File.join(File.dirname(`node --print "require.resolve('react-native/package.json')"`), "scripts/react_native_pods")
+# require File.join(File.dirname(`node --print "require.resolve('@react-native-community/cli-platform-ios/package.json')"`), "native_modules")
 
-end
+# require 'json'
+# podfile_properties = JSON.parse(File.read('./Podfile.properties.json')) rescue {}
+
+# platform :ios, podfile_properties['ios.deploymentTarget'] || '12.0'
+# install! 'cocoapods',
+#   :deterministic_uuids => false
+
+# target 'tag' do
+#   use_expo_modules!
+#   config = use_native_modules!
+
+#   use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
+
+#   # Flags change depending on the env values.
+#   flags = get_default_flags()
+
+#   use_react_native!(
+#     :path => config[:reactNativePath],
+#     :hermes_enabled => flags[:hermes_enabled] || podfile_properties['expo.jsEngine'] == 'hermes',
+#     :fabric_enabled => flags[:fabric_enabled],
+#     # An absolute path to your application root.
+#     :app_path => "#{Dir.pwd}/.."
+#   )
+
+#   # Uncomment to opt-in to using Flipper
+#   # Note that if you have use_frameworks! enabled, Flipper will not work
+#   #
+#   # if !ENV['CI']
+#   #   use_flipper!()
+#   # end
+
+#   post_install do |installer|
+#     react_native_post_install(installer)
+#     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+#   end
+
+#   post_integrate do |installer|
+#     begin
+#       expo_patch_react_imports!(installer)
+#     rescue => e
+#       Pod::UI.warn e
+#     end
+#   end
+
+# end

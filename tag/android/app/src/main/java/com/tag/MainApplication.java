@@ -13,6 +13,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.tag.newarchitecture.MainApplicationReactNativeHost;
+import com.airbnb.android.react.maps.MapsPackage;
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
@@ -72,6 +73,14 @@ public class MainApplication extends Application implements ReactApplication {
     super.onConfigurationChanged(newConfig);
     ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
   }
+
+  @Override
+protected List<ReactPackage> getPackages() {
+return Arrays.<ReactPackage>asList(
+    new MainReactPackage(),
+     new MapsPackage()
+   );
+}
 
   /**
    * Loads Flipper in React Native templates. Call this in the onCreate method with something like
