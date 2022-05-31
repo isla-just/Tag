@@ -1,5 +1,6 @@
 //we will be adding our db queries and functions 
 import {db} from "../Firebase"; //firestore instance
+// import { auth } from '../Firebase';
 
 //firestore functions
 import { doc, setDoc, Timestamp, collection, getDocs, addDoc, query, onSnapshot, where } from "firebase/firestore"; 
@@ -13,7 +14,11 @@ export const createUserOnRegister=(user, username)=>{
     const userData={
         email:user.email,
         username:username,
-        dateCreated: Timestamp.fromDate(new Date()),
+        location:{ geohash: 1, lat: 1, lng: 1},
+        tag:false,
+        avatar:"",
+        points:0,
+        powerup:""
     }
     //set a document setDoc(dumument reference, data we want to set, any additional options like merge)
     return setDoc(userRef, userData); //pass the correect one 
@@ -41,3 +46,24 @@ export const getAllCompetitions= async ()=>{
 
 return allData;
 }
+
+//setting the geolocation dynamically
+// export const updateLocation =(uid, data)=>{
+//     const userRef = doc(db, "users", uid);
+//     return setDoc(userRef, data, {merge:true}); // overwrite the location value if already set
+// }
+
+// //get all the user's locations
+// export const getAllLocations= async ()=>{
+//     //return a list of users
+//     const users=[];
+//     //snapshot for our users collection
+//     const querySnapshot = await getDocs(collection(db, 'users'));
+
+//     //need to loop through snapshot and get each document's data
+// querySnapshot.forEach((doc)=>{
+//     let user ={...doc.data(), uid:doc.id}
+//     users.push(user.location);
+// })
+// return users;
+// }

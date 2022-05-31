@@ -30,9 +30,9 @@ export default function Leaderboard({navigation}) {
 
             <ScrollView horizontal={true} style={styles.scrollable}>
               <Text style={styles.active}>Overview</Text>
-              <Text style={styles.inactive}>Tag time</Text>
+              {/* <Text style={styles.inactive}>Tag time</Text>
               <Text style={styles.inactive}>Least tags</Text>
-              <Text style={styles.inactive}>Most tags</Text>
+              <Text style={styles.inactive}>Most tags</Text> */}
             </ScrollView>
 
             <View style={styles.leaderboardWrapper}>

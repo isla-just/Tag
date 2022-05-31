@@ -4,12 +4,22 @@ import logo from '../assets/logo.png';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import avatar from '../assets/avatar.png';
+import { GeoPoint} from "firebase/firestore";
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import {db} from "../Firebase";
+import { doc, setDoc } from "firebase/firestore";
+
+const geofire = require('geofire-common');
+
 
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
+import { getAllLocations } from '../services/Database';
 
 import * as Font from 'expo-font';
+import { auth } from '../Firebase';
 
 Font.loadAsync({
   // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
@@ -18,12 +28,165 @@ Font.loadAsync({
   'semibold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
 });
 
+const mapStyle = [ {
+  "featureType": "administrative",
+  "elementType": "labels.text.fill",
+  "stylers": [
+      {
+          "color": "#6C97FB"
+      }
+  ]
+},
+{
+  "featureType": "landscape",
+  "elementType": "all",
+  "stylers": [
+      {
+          "color": "#FFFBEB"
+      }
+  ]
+},
+{
+  "featureType": "landscape",
+  "elementType": "geometry.fill",
+  "stylers": [
+      {
+          "color": "#ffffff"
+      }
+  ]
+},
+{
+  "featureType": "poi",
+  "elementType": "all",
+  "stylers": [
+      {
+          "visibility": "off"
+      }
+  ]
+},
+{
+  "featureType": "poi.park",
+  "elementType": "geometry.fill",
+  "stylers": [
+      {
+          "color": "#e6f3d6"
+      },
+      {
+          "visibility": "on"
+      }
+  ]
+},
+{
+  "featureType": "road",
+  "elementType": "all",
+  "stylers": [
+      {
+          "saturation": -100
+      },
+      {
+          "lightness": 45
+      },
+      {
+          "visibility": "simplified"
+      }
+  ]
+},
+{
+  "featureType": "road.highway",
+  "elementType": "all",
+  "stylers": [
+      {
+          "visibility": "simplified"
+      }
+  ]
+},
+{
+  "featureType": "road.highway",
+  "elementType": "geometry.fill",
+  "stylers": [
+      {
+          "color": "#FC915F"
+      },
+      {
+          "visibility": "simplified"
+      }
+  ]
+},
+{
+  "featureType": "road.highway",
+  "elementType": "labels.text",
+  "stylers": [
+      {
+          "color": "#4e4e4e"
+      }
+  ]
+},
+{
+  "featureType": "road.arterial",
+  "elementType": "geometry.fill",
+  "stylers": [
+      {
+          "color": "#f4f4f4"
+      }
+  ]
+},
+{
+  "featureType": "road.arterial",
+  "elementType": "labels.text.fill",
+  "stylers": [
+      {
+          "color": "#787878"
+      }
+  ]
+},
+{
+  "featureType": "road.arterial",
+  "elementType": "labels.icon",
+  "stylers": [
+      {
+          "visibility": "off"
+      }
+  ]
+},
+{
+  "featureType": "transit",
+  "elementType": "all",
+  "stylers": [
+      {
+          "visibility": "off"
+      }
+  ]
+},
+{
+  "featureType": "water",
+  "elementType": "all",
+  "stylers": [
+      {
+          "color": "#6C97FB"
+      },
+      {
+          "visibility": "on"
+      }
+  ]
+},
+{
+  "featureType": "water",
+  "elementType": "geometry.fill",
+  "stylers": [
+      {
+          "color": "#ADC1EF"
+      }
+  ]
+}]; //map styles go here!
+
 const Tag = ({navigation})=> {
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [loading, setLoading]=useState(true);
+
+  const [everyone, setEveryone]=useState({});
 
   const tokyoRegion = {
     latitude: -26.028729549982025,
@@ -32,7 +195,17 @@ const Tag = ({navigation})=> {
     longitudeDelta: 0.01,
   };
 
+
   useEffect(() => {
+
+    //     getAllLocations();
+
+    // const fetchAllLocations = async()=>{
+    //   const data = await getAllLocations();
+    //   console.log(data);
+    //   setEveryone(data);
+    // }
+
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -41,26 +214,29 @@ const Tag = ({navigation})=> {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
+      //only updates the value if you move 2 metres
+      let location = await Location.getCurrentPositionAsync({distanceInterval:2});
       setLocation(location);
 
       setDetails();
     })();
+
   }, []);
 
-
-
-  //checnge this to useeffet for dynamic location
   const [myLocation, setMyLocation] = useState({});
   const [text, setText] = useState('Waiting..');
   const [text2, setText2] = useState('Waiting..');
+  // const [x, setX] = useState('');
+  // const [y, setY] = useState('');
 
-  const setDetails=()=>{
+
+
+  const setDetails= async ()=>{
     if (errorMsg) {
       setText(errorMsg);
       setText2(errorMsg);
     } else if (location) {
-  
+
        setMyLocation( {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -72,12 +248,21 @@ const Tag = ({navigation})=> {
   
       setText(location.coords.latitude);
       setText2(location.coords.longitude);
-      // text = JSON.stringify(location);
-      // console.log(text);
-      // console.log(text2);
-    }
-  }
 
+      const lat = location.coords.latitude;
+      const lng = location.coords.longitude;
+      const hash = geofire.geohashForLocation([lat, lng]);
+
+      // Add a new document in collection "cities"
+      await setDoc(doc(db, "users", auth.currentUser.uid,), {
+        location: { 
+            geohash: hash,
+            lat: lat,
+            lng: lng},
+      }, {merge:true});
+
+        }
+      }
 
   return (
     <View style={styles.container}>
@@ -85,23 +270,23 @@ const Tag = ({navigation})=> {
           <Text style={styles.header}>Tag you’re it!</Text>
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
 
-          <Text style={styles.paragraph}>{text}</Text>
-          <Text style={styles.paragraph}>{text2}</Text>
+          {/* <Text style={styles.paragraph}>{text}</Text>
+          <Text style={styles.paragraph}>{auth.currentUser.uid}</Text> */}
 
           { loading ?  
     (
-     <ActivityIndicator /> //will render while loading
+     <ActivityIndicator color='#FFFBEB'/> //will render while loading
     ) : (
     
           <MapView
          style={styles.mapContainer}
          provider={PROVIDER_GOOGLE}
-         showsUserLocation={true}  
+         showsUserLocation={false}  
          followUserLocation={true}
         //  zoomEnabled={true}  
         //  zoomControlEnabled={true}  
          region={myLocation}
-         //need to set initial region to your current region
+         customMapStyle={mapStyle}
 
       >
 {/* 
@@ -110,7 +295,7 @@ const Tag = ({navigation})=> {
            image={avatar}
           />
   
-              <Marker coordinate={tokyoRegion}  image={leaderboard1}/>
+              <Marker coordinate={tokyoRegion}  image={leaderboard1} style={styles.marker}/>
       </MapView>
 
 ) }
@@ -142,7 +327,8 @@ const styles = StyleSheet.create({
       fontSize:15,
       marginTop:20,
       textAlign:'center',
-      marginHorizontal:50
+      marginHorizontal:50,
+      marginBottom:20
   },
   header:{
       color:'#fff',
@@ -173,5 +359,8 @@ overflow:'hidden',
     fontFamily:'semibold',
     textAlign:'center',
     fontSize:18
+}, marker:{
+  borderWidth:2,
+  borderColor:"#FB5E1B",
 }
 });
