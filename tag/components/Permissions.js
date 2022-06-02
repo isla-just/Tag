@@ -27,8 +27,8 @@ export default function Permissions({navigation}) {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let location2 = await Location.getCurrentPositionAsync({});
+      setLocation(location2);
     })();
   }, []);
 

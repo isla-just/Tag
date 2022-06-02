@@ -8,7 +8,7 @@ import { GeoPoint} from "firebase/firestore";
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import {db} from "../Firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs } from "firebase/firestore";
 
 const geofire = require('geofire-common');
 
@@ -16,7 +16,7 @@ const geofire = require('geofire-common');
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
-import { getAllLocations } from '../services/Database';
+import { updateLocation } from '../services/Database';
 
 import * as Font from 'expo-font';
 import { auth } from '../Firebase';
@@ -182,11 +182,11 @@ const mapStyle = [ {
 const Tag = ({navigation})=> {
 
   const [location, setLocation] = useState(null);
+  const [actualLocation, setActualLocation] = useState({});
+
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [loading, setLoading]=useState(true);
-
-  const [everyone, setEveryone]=useState({});
 
   const tokyoRegion = {
     latitude: -26.028729549982025,
@@ -195,17 +195,7 @@ const Tag = ({navigation})=> {
     longitudeDelta: 0.01,
   };
 
-
   useEffect(() => {
-
-    //     getAllLocations();
-
-    // const fetchAllLocations = async()=>{
-    //   const data = await getAllLocations();
-    //   console.log(data);
-    //   setEveryone(data);
-    // }
-
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
@@ -215,45 +205,64 @@ const Tag = ({navigation})=> {
       }
 
       //only updates the value if you move 2 metres
-      let location = await Location.getCurrentPositionAsync({distanceInterval:2});
-      setLocation(location);
-
-      setDetails();
+      let location2 = await Location.getCurrentPositionAsync({distanceInterval:2});
+      setLocation(location2);
+            // console.log(location2);
     })();
-
   }, []);
+
+  //lisening for changes
+  useEffect(() => {
+
+
+      if(location != actualLocation){
+        setActualLocation(location);
+        setDetails();
+
+        // setText(location.coords.latitude);
+
+        // setText2(location.coords.longitude);
+    }
+
+  },[location])
+
+    //lisening for changes
+    useEffect(() => {
+
+      getAllUserLocations();
+
+  },[])
 
   const [myLocation, setMyLocation] = useState({});
   const [text, setText] = useState('Waiting..');
   const [text2, setText2] = useState('Waiting..');
-  // const [x, setX] = useState('');
-  // const [y, setY] = useState('');
-
-
 
   const setDetails= async ()=>{
     if (errorMsg) {
       setText(errorMsg);
       setText2(errorMsg);
-    } else if (location) {
+    } else if (actualLocation) {
 
        setMyLocation( {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: actualLocation.coords.latitude,
+        longitude: actualLocation.coords.longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
       }) 
   
-      setLoading(false);
-  
-      setText(location.coords.latitude);
-      setText2(location.coords.longitude);
+      // setLoading(false);
 
-      const lat = location.coords.latitude;
-      const lng = location.coords.longitude;
+      console.log(actualLocation);
+
+      const lat = actualLocation.coords.latitude;
+      const lng = actualLocation.coords.longitude;
       const hash = geofire.geohashForLocation([lat, lng]);
 
+      console.log(lat);
+      console.log(lng);
+
       // Add a new document in collection "cities"
+
       await setDoc(doc(db, "users", auth.currentUser.uid,), {
         location: { 
             geohash: hash,
@@ -264,14 +273,75 @@ const Tag = ({navigation})=> {
         }
       }
 
+      const [allUsers, setAllUsers]=useState([]);
+
+      const getAllUserLocations= async ()=>{
+        // Find cities within 50km of London
+const center = [actualLocation.coords.latitude, actualLocation.coords.longitude];
+const radiusInM = 50 * 1000;
+
+// Each item in 'bounds' represents a startAt/endAt pair. We have to issue
+// a separate query for each pair. There can be up to 9 pairs of bounds
+// depending on overlap, but in most cases there are 4.
+const bounds = geofire.geohashQueryBounds(center, radiusInM);
+const promises = [];
+for (const b of bounds) {
+  // const q = db.collection('cities')
+  //   .orderBy('geohash')
+  //   .startAt(b[0])
+  //   .endAt(b[1]);
+
+    //realtime listener afterwards
+    const q= query (collection(db, 'users'), orderBy('location.geohash'), startAt(b[0]), endAt(b[1]));
+    const querySnapshot = await getDocs(q);
+
+    //need to loop through snapshot and get each document's data
+    // querySnapshot.forEach((doc) => {
+
+    //     let user = {...doc.data(), uid: doc.id}
+    //     users.push(user);
+    // })
+
+  promises.push(querySnapshot);
+}
+
+// Collect all the query results together into a single list
+Promise.all(promises).then((snapshots) => {
+  const matchingDocs = [];
+
+  for (const snap of snapshots) {
+    for (const doc of snap.docs) {
+      const lat = doc.get('location.lat');
+      const lng = doc.get('location.lng');
+
+      // We have to filter out a few false positives due to GeoHash
+      // accuracy, but most will match
+      const distanceInKm = geofire.distanceBetween([lat, lng], center);
+      const distanceInM = distanceInKm * 1000;
+      if (distanceInM <= radiusInM) {
+        matchingDocs.push(doc.data());
+      }
+    }
+  }
+
+  return matchingDocs;
+}).then((matchingDocs) => {
+console.log(matchingDocs);
+//set the state of list of locations
+setAllUsers(matchingDocs);
+setLoading(false);
+console.log(allUsers);
+});
+      }
+
   return (
     <View style={styles.container}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.header}>Tag you’re it!</Text>
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
 
-          {/* <Text style={styles.paragraph}>{text}</Text>
-          <Text style={styles.paragraph}>{auth.currentUser.uid}</Text> */}
+          {/* <Text style={styles.paragraph}>{text}</Text> */}
+          <Text style={styles.paragraph}>{auth.currentUser.uid}</Text>
 
           { loading ?  
     (
@@ -281,7 +351,7 @@ const Tag = ({navigation})=> {
           <MapView
          style={styles.mapContainer}
          provider={PROVIDER_GOOGLE}
-         showsUserLocation={false}  
+         showsUserLocation={true}  
          followUserLocation={true}
         //  zoomEnabled={true}  
         //  zoomControlEnabled={true}  
@@ -291,11 +361,28 @@ const Tag = ({navigation})=> {
       >
 {/* 
         //i would have a map to loop through all the current active locations */}
+
+{allUsers.map((item, index)=>(
+            <TouchableOpacity key={index}>
+               <Marker coordinate={{
+                
+                 latitude:item.location.lng,
+                 longitude:item.location.lat,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                  
+               }}  image={leaderboard1} style={styles.marker}/>
+            </TouchableOpacity>
+          ))}
+
+<TouchableOpacity>
           <Marker coordinate={myLocation} 
            image={avatar}
           />
+</TouchableOpacity>
   
-              <Marker coordinate={tokyoRegion}  image={leaderboard1} style={styles.marker}/>
+  
+             
       </MapView>
 
 ) }
@@ -327,8 +414,7 @@ const styles = StyleSheet.create({
       fontSize:15,
       marginTop:20,
       textAlign:'center',
-      marginHorizontal:50,
-      marginBottom:20
+      marginHorizontal:50,marginBottom:20
   },
   header:{
       color:'#fff',
