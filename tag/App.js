@@ -25,6 +25,7 @@ import Join from './components/Join';
 import Waiting from './components/Waiting';
 import PowerupDetail from './components/PowerupDetail';
 import Leaderboard from './components/Leaderboard';
+import Tagged from './components/Tagged';
 
 
 export default function App() {
@@ -72,6 +73,7 @@ return unsubscribe;
           <Stack.Screen name="Powerup" component ={Powerup} options={{headerShown:false}}/>
           <Stack.Screen name="PowerupDetail" component ={PowerupDetail} options={{headerShown:false}}/>
           <Stack.Screen name="Leaderboard" component ={Leaderboard} options={{headerShown:false}}/>
+          <Stack.Screen name="Tagged" component ={Tagged} options={{headerShown:false}}/>
         </>
       {/* )} */}
       </Stack.Navigator>

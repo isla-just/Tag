@@ -182,7 +182,6 @@ const mapStyle = [ {
 const Tag = ({navigation})=> {
 
   const [location, setLocation] = useState(null);
-  const [actualLocation, setActualLocation] = useState({});
 
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -203,104 +202,109 @@ const Tag = ({navigation})=> {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-
-      //only updates the value if you move 2 metres
-      let location2 = await Location.getCurrentPositionAsync({distanceInterval:2});
+              //only updates the value if you move 2 metres
+      let location2 = await Location.getCurrentPositionAsync({});
       setLocation(location2);
-            // console.log(location2);
+
     })();
   }, []);
 
-  //lisening for changes
+  let text = 'Waiting';
+
+  //lisening for location changes
   useEffect(() => {
 
+    if (errorMsg) {
+      text = errorMsg;
+      // console.log(errorMsg);
+      
+    } else if (location) {
+      text = JSON.stringify(location);
+      // console.log(location.coords.longitude);
+      // setTempLocation(location);
 
-      if(location != actualLocation){
-        setActualLocation(location);
+      console.log(location);
+      // console.log(tempLocation);
+  
+      // if(location != tempLocation){
+        // setDetails();
+
+        console.log(location);
+
+        setMyLocation( {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+
         setDetails();
+        getAllUserLocations();
+      setLoading(false);
 
-        // setText(location.coords.latitude);
-
-        // setText2(location.coords.longitude);
     }
 
   },[location])
 
-    //lisening for changes
-    useEffect(() => {
+  //   //lisening for changes
+  //   useEffect(() => {
 
-      getAllUserLocations();
+  //     getAllUserLocations();
 
-  },[])
+  // },[])
 
   const [myLocation, setMyLocation] = useState({});
-  const [text, setText] = useState('Waiting..');
-  const [text2, setText2] = useState('Waiting..');
 
   const setDetails= async ()=>{
+
     if (errorMsg) {
-      setText(errorMsg);
-      setText2(errorMsg);
-    } else if (actualLocation) {
-
-       setMyLocation( {
-        latitude: actualLocation.coords.latitude,
-        longitude: actualLocation.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }) 
-  
-      // setLoading(false);
-
-      console.log(actualLocation);
-
-      const lat = actualLocation.coords.latitude;
-      const lng = actualLocation.coords.longitude;
+      text = errorMsg;
+      // console.log(errorMsg);
+      
+    } else if (location) {
+        
+      const lat = location.coords.latitude;
+      const lng = location.coords.longitude;
       const hash = geofire.geohashForLocation([lat, lng]);
 
-      console.log(lat);
-      console.log(lng);
+      // console.log(lat);
+      // console.log(lng);
 
       // Add a new document in collection "cities"
 
+      //change this to accept realtime data
       await setDoc(doc(db, "users", auth.currentUser.uid,), {
         location: { 
             geohash: hash,
             lat: lat,
             lng: lng},
       }, {merge:true});
-
-        }
+        
       }
+    }
 
       const [allUsers, setAllUsers]=useState([]);
 
       const getAllUserLocations= async ()=>{
+
+        if (errorMsg) {
+          text = errorMsg;
+          // console.log(errorMsg);
+          
+        } else if (location) {
+       
         // Find cities within 50km of London
-const center = [actualLocation.coords.latitude, actualLocation.coords.longitude];
+const center = [location.coords.latitude, location.coords.longitude];
 const radiusInM = 50 * 1000;
 
 // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
-// a separate query for each pair. There can be up to 9 pairs of bounds
-// depending on overlap, but in most cases there are 4.
 const bounds = geofire.geohashQueryBounds(center, radiusInM);
 const promises = [];
 for (const b of bounds) {
-  // const q = db.collection('cities')
-  //   .orderBy('geohash')
-  //   .startAt(b[0])
-  //   .endAt(b[1]);
 
-    //realtime listener afterwards
+    //TODO: realtime listener afterwards - get all locations except the current uer id
     const q= query (collection(db, 'users'), orderBy('location.geohash'), startAt(b[0]), endAt(b[1]));
     const querySnapshot = await getDocs(q);
-
-    //need to loop through snapshot and get each document's data
-    // querySnapshot.forEach((doc) => {
-
-    //     let user = {...doc.data(), uid: doc.id}
-    //     users.push(user);
-    // })
 
   promises.push(querySnapshot);
 }
@@ -323,16 +327,18 @@ Promise.all(promises).then((snapshots) => {
       }
     }
   }
+  
 
   return matchingDocs;
 }).then((matchingDocs) => {
-console.log(matchingDocs);
+// console.log(matchingDocs);
 //set the state of list of locations
 setAllUsers(matchingDocs);
-setLoading(false);
 console.log(allUsers);
 });
       }
+    }
+
 
   return (
     <View style={styles.container}>
@@ -341,7 +347,6 @@ console.log(allUsers);
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
 
           {/* <Text style={styles.paragraph}>{text}</Text> */}
-          <Text style={styles.paragraph}>{auth.currentUser.uid}</Text>
 
           { loading ?  
     (
@@ -362,25 +367,21 @@ console.log(allUsers);
 {/* 
         //i would have a map to loop through all the current active locations */}
 
-{allUsers.map((item, index)=>(
-            <TouchableOpacity key={index}>
-               <Marker coordinate={{
+        {allUsers.map((item, index)=>(
+
+        <Marker key={index} title={item.username} coordinate={{latitude:item.location.lat, longitude:item.location.lng}} onPress={()=> navigation.navigate("Tagged" , item)}/>
+          
+              //  <Marker key={index} coordinate={{
                 
-                 latitude:item.location.lng,
-                 longitude:item.location.lat,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
+              //    latitude:item.location.lng,
+              //    longitude:item.location.lat,
                   
-               }}  image={leaderboard1} style={styles.marker}/>
-            </TouchableOpacity>
+              //  }}  image={leaderboard1} style={styles.marker}/>
           ))}
 
-<TouchableOpacity>
           <Marker coordinate={myLocation} 
            image={avatar}
           />
-</TouchableOpacity>
-  
   
              
       </MapView>

@@ -6,7 +6,7 @@ import {db} from "../Firebase"; //firestore instance
 import { doc, setDoc, Timestamp, collection, getDocs, addDoc, query, onSnapshot, where } from "firebase/firestore"; 
 
 //creates a document for the user in our users collection
-export const createUserOnRegister=(user, username)=>{
+export const createUserOnRegister=(user, username, apipfp)=>{
     //document reference: doc(firestore init, collection name, optional - id of the document (name/id))
     const userRef = doc(db, "users", user.uid);
 
@@ -16,9 +16,11 @@ export const createUserOnRegister=(user, username)=>{
         username:username,
         location:{ geohash: 1, lat: 1, lng: 1},
         tag:false,
-        avatar:"",
+        avatar:apipfp,
         points:0,
-        powerup:""
+        powerup:"",
+        uid:user.uid,
+        // uid:user.uid
     }
     //set a document setDoc(dumument reference, data we want to set, any additional options like merge)
     return setDoc(userRef, userData); //pass the correect one 
@@ -47,23 +49,14 @@ export const getAllCompetitions= async ()=>{
 return allData;
 }
 
-//setting the geolocation dynamically
-// export const updateLocation =(uid, data)=>{
-//     const userRef = doc(db, "users", uid);
-//     return setDoc(userRef, data, {merge:true}); // overwrite the location value if already set
-// }
+// set our profile data - updaye
+export const updateTag =(uid, data)=>{
+    const userRef = doc(db, "users", uid);
+    return setDoc(userRef, data, {merge:true}); // add the option to merge document andnot overwrite 
+}
 
-// //get all the user's locations
-// export const getAllLocations= async ()=>{
-//     //return a list of users
-//     const users=[];
-//     //snapshot for our users collection
-//     const querySnapshot = await getDocs(collection(db, 'users'));
-
-//     //need to loop through snapshot and get each document's data
-// querySnapshot.forEach((doc)=>{
-//     let user ={...doc.data(), uid:doc.id}
-//     users.push(user.location);
-// })
-// return users;
-// }
+export const settag= (uid, data) =>{
+    const userRef = doc(db, 'users', uid);
+    return setDoc(userRef, data, {merge:true});//option to merge and not overrite
+  
+}

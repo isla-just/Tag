@@ -22,6 +22,9 @@ export default function SignUp({navigation}) {
     const [email, onEmailChange]=useState("");
     const [password, onPasswordChange]=useState("");
 
+// API
+var apipfp = "https://source.boringavatars.com/beam/Maria%20Mitchell?colors=FFD346,6C97FB,F583B4,FECE34,FFA6BA";
+
     //button handleLoginPress
     const handleLoginPress = () =>{
 
@@ -31,7 +34,7 @@ export default function SignUp({navigation}) {
             .then((userCredentials) =>{
                 //when successful
                 const user = userCredentials.user;
-                createUserOnRegister(user, username)
+                createUserOnRegister(user, username, apipfp)
 
                 //to do: add user to DB
                 

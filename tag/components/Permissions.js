@@ -27,17 +27,17 @@ export default function Permissions({navigation}) {
         return;
       }
 
-      let location2 = await Location.getCurrentPositionAsync({});
+      let location2 = await Location.getCurrentPositionAsync();
       setLocation(location2);
     })();
   }, []);
 
-  let text = 'Waiting..';
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
+  // let text = 'Waiting..';
+  // if (errorMsg) {
+  //   text = errorMsg;
+  // } else if (location) {
+  //   text = JSON.stringify(location);
+  // }
 
   return (
     <View style={styles.container}>
@@ -45,7 +45,7 @@ export default function Permissions({navigation}) {
           <Text style={styles.sub}>So here's the deal...</Text>
           <Text style={styles.header}>We need to use your location so you can play tag with people all over the world</Text>
 
-          <TouchableOpacity style={styles.btn} onPress={()=> navigation.replace("Tag")}>
+          <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Tag")}>
             <Text style={styles.btntxt}>I understand</Text> 
             <Image source={arrow} style={styles.arrow} />
           </TouchableOpacity>
