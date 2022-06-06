@@ -30,7 +30,7 @@ export default function Tagged({route, navigation}) {
 
     //using the use states to set the new data
     await updateTag(auth.currentUser.uid,{tag:false});
-    await settag(params.uid, {tag:true});
+    await settag(params.uid, {tag:true, tagCount:+1});
     // setNewTag();
 
     console.log("status has changed");

@@ -2,13 +2,18 @@ import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import logo from '../assets/logo.png';
 import express from '../assets/expression.png';
-import avatar from '../assets/avatar.png';
+// import avatar from '../assets/avatar.png';
 
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
 
 import { getAllCompetitions } from '../services/Database';
+import { updateStatus } from '../services/Database';
+import { signOut } from 'firebase/auth';
+import { auth } from '../Firebase';
+import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
+import {db} from "../Firebase";
 
 import * as Font from 'expo-font';
 
@@ -22,26 +27,70 @@ Font.loadAsync({
 export default function Home({navigation}) {
 
     const [competitions, setCompetitions]=useState([]);
+    const [userData, setUserData]=useState([]);
+    const [tagged, setTagged]=useState(false);
 
+    const onSignOutPress = () =>{
+        signOut(auth).then(() =>{
+          //Success
+        })
+        .catch((error) =>{
+            Alert.alert(error.message);
+        })
+      }
 
+//get all the user documents
+const getAUser= async ()=>{
+
+    id=auth.currentUser.uid;
+
+    const docRef = doc(db, "users", id);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      setUserData(docSnap.data());
+      console.log(userData);
+    } else {
+      console.log("No such document!");
+    }
+}
 
     useEffect(()=>{
         fetchAllCompetitions();
+        getAUser();
       },[]);
     
       const fetchAllCompetitions = async()=>{
         const data = await getAllCompetitions();
         console.log(data);
         setCompetitions(data);
+
+//changing the state of the competition
+    const currentDate = new Date();
+    const timestamp = currentDate.getTime();
+
+    if(timestamp>competitions.endDate){
+        console.log("competition is over");
+        //update the status to false
+
+        // await updateStatus(competitions.uid,{status:"inactive"});
+        // console.log("status has been updated")
+    
+    }else{
+        // console.log("competition is not over")
+    }
+
       }
 
   return (
+
     <ScrollView style={styles.container}>
         <View style={styles.circleBg}></View>
 
         <Image source={logo} style={styles.logo} />
+        {/* <Text>{userData.avatar}</Text> */}
 
-        <Image source={avatar} style={styles.avatar} />
+        <Image source={{uri: `${userData.avatar}`}} style={styles.avatar2} />
         
         <Text style={styles.header}>Hey hey!</Text>
         <Text style={styles.body}>20 days and 4hrs left in the game</Text>
@@ -49,11 +98,11 @@ export default function Home({navigation}) {
 {/* pink circle */}
         <View style={styles.where}>
             <Text style={styles.where1}>tag is in</Text>
-            <Text style={styles.where2}>England</Text>
+            <Text style={styles.where2}>South Africa</Text>
         </View>
 
 {/* yellow circle */}
-        <TouchableOpacity style={styles.join} onPress={()=> navigation.navigate("Join")}>
+        <TouchableOpacity style={styles.join} onPress={()=> navigation.navigate("Join", userData)}>
             <Text style={styles.join1}>join</Text>
             <Text style={styles.join2}>next game</Text>
         </TouchableOpacity>
@@ -62,7 +111,7 @@ export default function Home({navigation}) {
         <TouchableOpacity onPress={()=> navigation.navigate("Powerup")}
          style={styles.block}>
             <Text style={styles.block1}>tag blocker</Text>
-            <Text style={styles.block2}>12:10:45</Text>
+            <Text style={styles.block2}>{userData.powerup}</Text>
         </TouchableOpacity>
 
         <Image source={express} style={styles.express} />
@@ -95,21 +144,24 @@ export default function Home({navigation}) {
         {/* stats bubbles */}
         {/* pink circle */}
         <View style={styles.yourPoints}>
-            <Text style={styles.yourPoints1}>21</Text>
+            <Text style={styles.yourPoints1}>{userData.points}</Text>
             <Text style={styles.yourPoints2}>your points</Text>
         </View>
 
                 {/* orange circle */}
         <View style={styles.yourTag}>
-            <Text style={styles.yourTag1}>3</Text>
+            <Text style={styles.yourTag1}>{userData.tagCount}</Text>
             <Text style={styles.yourTag2}>tags</Text>
         </View>
 
         {/* yellow circle */}
         <View style={styles.yourMins}>
-            <Text style={styles.yourMins1}>25 mins</Text>
-            <Text style={styles.yourMins2}>avg time to pass tag</Text>
+     
+            <Text style={styles.yourMins2}>your region</Text>
+            <Text style={styles.yourMins1}>South Africa</Text>
         </View>
+
+        <TouchableOpacity style={styles.btn2} onPress={onSignOutPress}><Text style={styles.btnTxt}>Log out</Text></TouchableOpacity>
 
         <View style={styles.lastBig}></View>
 
@@ -138,7 +190,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 41,
     marginTop: 20,
-  },    avatar: {
+  },    avatar2: {
     width: 55,
     height: 55,
     marginTop: -50,
@@ -366,9 +418,17 @@ textAlign:'center'
     width:683,
     height:683,
     borderRadius:683,
-    bottom:-500,
+    bottom:-350,
     marginLeft:-280,
     position:'absolute',
     zIndex:-1
+},btn2:{
+    width:'100%',
+    padding:20,
+    backgroundColor:'#FFA6BA',
+    borderRadius:100,
+    marginTop:10,
+    marginBottom:80
+
 }
 });

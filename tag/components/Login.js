@@ -31,7 +31,7 @@ export default function Login({navigation}) {
             const user = userCredentials.user;
             Alert.alert(user.uid);
 
-            navigation.replace("Permissions");
+            navigation.navigate("Permissions");
         })
         .catch((error)=>{
             //when failed

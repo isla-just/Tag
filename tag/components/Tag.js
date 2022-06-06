@@ -229,7 +229,7 @@ const Tag = ({navigation})=> {
       // if(location != tempLocation){
         // setDetails();
 
-        console.log(location);
+        // console.log(location);
 
         setMyLocation( {
           latitude: location.coords.latitude,
@@ -334,14 +334,14 @@ Promise.all(promises).then((snapshots) => {
 // console.log(matchingDocs);
 //set the state of list of locations
 setAllUsers(matchingDocs);
-console.log(allUsers);
+// console.log(allUsers);
 });
       }
     }
 
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container2}>
           <Image source={logo} style={styles.logo} />
           <Text style={styles.header}>Tag you’re it!</Text>
           <Text style={styles.sub}>Find someone closeby to pass the tag to</Text>
@@ -379,9 +379,9 @@ console.log(allUsers);
               //  }}  image={leaderboard1} style={styles.marker}/>
           ))}
 
-          <Marker coordinate={myLocation} 
+          {/* <Marker coordinate={myLocation} 
            image={avatar}
-          />
+          /> */}
   
              
       </MapView>
@@ -389,7 +389,7 @@ console.log(allUsers);
 ) }
 
 
-          <TouchableOpacity onPress={()=> navigation.navigate("Home")}style={styles.btn}><Text style={styles.btnTxt}>Tag selected person</Text></TouchableOpacity>
+          {/* <TouchableOpacity onPress={()=> navigation.navigate("Home")}style={styles.btn}><Text style={styles.btnTxt}>Tag selected person</Text></TouchableOpacity> */}
     </View>
   );
 }
@@ -398,7 +398,7 @@ export default Tag;
 
 const styles = StyleSheet.create({
  
-  container: {
+  container2: {
     flex: 1,
     backgroundColor: '#FB5E1B',
     width:'100%',

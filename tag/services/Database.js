@@ -18,13 +18,21 @@ export const createUserOnRegister=(user, username, apipfp)=>{
         tag:false,
         avatar:apipfp,
         points:0,
-        powerup:"",
+        powerup:"none",
         uid:user.uid,
+        tagCount:0
         // uid:user.uid
     }
     //set a document setDoc(dumument reference, data we want to set, any additional options like merge)
     return setDoc(userRef, userData); //pass the correect one 
 }
+
+
+// scheduled function:
+// 1. Get the current active competion
+// 2. Is the end date past the current date
+// 3. If yes, update to inactive and create new competition
+// 4. If not, do nothing..
 
 //get the current active competition
 export const getAllCompetitions= async ()=>{
@@ -37,10 +45,11 @@ export const getAllCompetitions= async ()=>{
 
     querySnapshot.forEach((doc)=>{
     const compData={
-        startDate:(doc.data().startDate).toDate().toDateString(),
-        startTime:(doc.data().startDate).toDate().toLocaleTimeString('en-US'),
+        startDate:doc.data().startDate,
         endDate:doc.data().endDate,
         prize:doc.data().prize,
+        uid:doc.data().uid,
+        status:doc.data().status,
     }
 
     allData=compData;
@@ -60,3 +69,15 @@ export const settag= (uid, data) =>{
     return setDoc(userRef, data, {merge:true});//option to merge and not overrite
   
 }
+
+export const updateStatus= (uid, data) =>{
+    const userRef = doc(db, 'competitions', uid);
+    return setDoc(userRef, data, {merge:true});//option to merge and not overrite
+  
+}
+
+export const addParticipant=(data, id)=>{
+    //hardcoded in for now
+    const collectionRef=collection(db,"competitions/VelMvYWU3g3CFrLYTRhD/participants");
+    return addDoc(collectionRef, data);
+   }

@@ -1,6 +1,8 @@
 import React,{useState} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
+import { addParticipant } from '../services/Database';
+import { auth } from '../Firebase';
 
 import * as Font from 'expo-font';
 
@@ -11,13 +13,29 @@ Font.loadAsync({
     'semiBold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
   });
 
-export default function Join({navigation}) {
+export default function Join({route, navigation}) {
+
+    const userData=route.params;
+    const avatar=userData.avatar;
+    const points=userData.points;
+    const username=userData.username;
+    const id=userData.uid;
+
+    console.log(userData);
+    
+    const AddParticipant = async ()=>{
+        addParticipant({avatar, points, username},id)
+    
+        navigation.navigate("Waiting");
+    }
+
   return (
 
 
         <View style={styles.content}>
             <Image source={logo} style={styles.logo} />
             <Text style={styles.header}>Join the next huge tag game!</Text>
+            {/* <Text>{userData.uid}</Text> */}
 
             {/* // orange circle */}
         <View style={styles.orange}>
@@ -36,7 +54,7 @@ export default function Join({navigation}) {
 
 
             {/* // yellow circle */}
-        <TouchableOpacity style={styles.yellow} onPress={()=> navigation.replace("Waiting")}>
+        <TouchableOpacity style={styles.yellow} onPress={AddParticipant}>
             <Text style={styles.yellow1}>Join game</Text>
         </TouchableOpacity>
 
