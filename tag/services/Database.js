@@ -78,6 +78,10 @@ export const updateStatus= (uid, data) =>{
 
 export const addParticipant=(data, id)=>{
     //hardcoded in for now
-    const collectionRef=collection(db,"competitions/VelMvYWU3g3CFrLYTRhD/participants");
+    const collectionRef=collection(db,"competitions/L8494g2QwU5IJPld1UCs/participants");
     return addDoc(collectionRef, data);
    }
+
+   export const newCompetition=(competition)=>{
+    return addDoc(collection(db, 'competitions'), competition);
+}

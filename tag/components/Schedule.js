@@ -8,6 +8,7 @@ exports.createCompetition = functions.pubsub
     .onRun(async (context) => {
         const competitions = firestore.collection('competitions')
 
+        //wrapping code you want to execute in cloud function
         await createCompetition()
         const competition = await competitions.where('status', '==', false).get()
         user.forEach(snapshot => {
@@ -19,6 +20,7 @@ exports.createCompetition = functions.pubsub
     //an array of powerups for prizes loop through randomly
 
     //this needs to be called using a cloud function
+    //give your cloud function a new directory - separate project that executes your crud for you
 export const createCompetition=(competition, startDate, endDate)=>{
     const compRef = doc(db, "competitions", competition.uid);
 

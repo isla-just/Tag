@@ -9,13 +9,14 @@ import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
 
 import { getAllCompetitions } from '../services/Database';
-import { updateStatus } from '../services/Database';
+import { newCompetition } from '../services/Database';
 import { signOut } from 'firebase/auth';
 import { auth } from '../Firebase';
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
 import {db} from "../Firebase";
 
 import * as Font from 'expo-font';
+import Avatar from 'react-native-boring-avatars';
 
 Font.loadAsync({
   // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
@@ -49,10 +50,38 @@ const getAUser= async ()=>{
     
     if (docSnap.exists()) {
       setUserData(docSnap.data());
-      console.log(userData);
+
+      if(userData.tag=true){
+          setTagged(true);
+      }else{
+        setTagged(false);
+      }
     } else {
       console.log("No such document!");
     }
+}
+
+const saveCompetition = async()=>{
+
+    // setting the start date
+    var startDate = new Date(); // Now
+    startDate.setDate(startDate.getDate() + 30); // Set now + 30 days as the new date
+    console.log("start"+startDate);
+
+        // setting the end date
+        var endDate = new Date(); // Now
+        endDate.setDate(endDate.getDate() + 60); // Set now + 30 days as the new date
+        console.log("end"+endDate);
+
+
+    const data = {
+        endDate:endDate,
+        startDate:startDate,
+        prize:"technology",
+        status:"inactive",
+    }
+
+     await newCompetition(data);
 }
 
     useEffect(()=>{
@@ -65,32 +94,24 @@ const getAUser= async ()=>{
         console.log(data);
         setCompetitions(data);
 
-//changing the state of the competition
-    const currentDate = new Date();
-    const timestamp = currentDate.getTime();
-
-    if(timestamp>competitions.endDate){
-        console.log("competition is over");
-        //update the status to false
-
-        // await updateStatus(competitions.uid,{status:"inactive"});
-        // console.log("status has been updated")
-    
-    }else{
-        // console.log("competition is not over")
-    }
-
       }
+      
 
   return (
-
     <ScrollView style={styles.container}>
         <View style={styles.circleBg}></View>
 
         <Image source={logo} style={styles.logo} />
-        {/* <Text>{userData.avatar}</Text> */}
 
-        <Image source={{uri: `${userData.avatar}`}} style={styles.avatar2} />
+<View   style={styles.avatar2}>
+      <Avatar
+        size={55}
+        name={userData.avatar}
+        variant="beam"
+        colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+        />
+</View>
+      
         
         <Text style={styles.header}>Hey hey!</Text>
         <Text style={styles.body}>20 days and 4hrs left in the game</Text>
@@ -113,6 +134,8 @@ const getAUser= async ()=>{
             <Text style={styles.block1}>tag blocker</Text>
             <Text style={styles.block2}>{userData.powerup}</Text>
         </TouchableOpacity>
+
+                <TouchableOpacity style={styles.btn2} onPress={saveCompetition}><Text style={styles.btnTxt}>Generate new</Text></TouchableOpacity>
 
         <Image source={express} style={styles.express} />
 
