@@ -3,7 +3,7 @@ import {db} from "../Firebase"; //firestore instance
 // import { auth } from '../Firebase';
 
 //firestore functions
-import { doc, setDoc, Timestamp, collection, getDocs, addDoc, query, onSnapshot, where } from "firebase/firestore"; 
+import { doc, setDoc, Timestamp, collection, getDocs, addDoc, query, onSnapshot, where, orderBy, limit } from "firebase/firestore"; 
 
 //creates a document for the user in our users collection
 export const createUserOnRegister=(user, username, apipfp)=>{
@@ -35,7 +35,7 @@ export const createUserOnRegister=(user, username, apipfp)=>{
 // 4. If not, do nothing..
 
 //get the current active competition
-export const getAllCompetitions= async ()=>{
+export const getActiveCompetition= async ()=>{
 
     //snapshot for our users collection
     const querySnapshot = await getDocs(collection(db, 'competitions'), where("status", "==", "active"));
@@ -77,11 +77,48 @@ export const updateStatus= (uid, data) =>{
 }
 
 export const addParticipant=(data, id)=>{
-    //hardcoded in for now
-    const collectionRef=collection(db,"competitions/L8494g2QwU5IJPld1UCs/participants");
-    return addDoc(collectionRef, data);
+
+        const collectionRef=collection(db,"competitions/"+id+"/participants");
+        return addDoc(collectionRef, data);
+
    }
 
    export const newCompetition=(competition)=>{
     return addDoc(collection(db, 'competitions'), competition);
+}
+
+
+
+// //get all the user documents
+// export const listenToAllProjects= async ()=>{
+//     //return a list of users
+//     const projects=[];
+//     //snapshot for our users collection
+//     const querySnapshot = await getDocs(collection(db, 'projects'));
+
+//     //need to loop through snapshot and get each document's data
+// querySnapshot.forEach((doc)=>{
+//     let project ={...doc.data(), uid:doc.id}
+//     projects.push(project);
+// })
+// return projects;
+// }
+
+// //returns our collection reference that we want to listen for real updates 
+// export const getCollectionListener=()=>{
+//     //returning this reference
+//     return collection(db, "projects");
+// }
+
+export const getAllParticipants=async (id)=>{
+let participants=[];
+
+const collectionRef=query(collection(db, "competitions/"+id+"/participants") ,orderBy('points', 'asc'));
+const collectionSnapshot = await getDocs(collectionRef);
+
+collectionSnapshot.forEach((doc)=>{
+    participants.push(doc.data());
+    // console.log(doc.data());
+});
+return participants;
 }

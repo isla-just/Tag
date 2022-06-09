@@ -1,5 +1,5 @@
 import React,{useState, useEffect} from 'react';
-import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import logo from '../assets/logo.png';
 import express from '../assets/expression.png';
 // import avatar from '../assets/avatar.png';
@@ -32,7 +32,11 @@ export default function Home({navigation}) {
 
     const [competitions, setCompetitions]=useState([]);
     const [userData, setUserData]=useState([]);
+    const [yourRegion, setYourRegion]=useState([]);
     const id=auth.currentUser.uid;
+    const [isLoading, setLoading]=useState(true);
+    const [lng, setLng]=useState(0);
+    const [lat, setLat]=useState(0);
     // const [tagged, setTagged]=useState(false);
 
     const onSignOutPress = () =>{
@@ -52,6 +56,8 @@ const getAUser= async ()=>{
     
     if (docSnap.exists()) {
       setUserData(docSnap.data());
+      setLat(docSnap.data().location.lat);
+      setLng(docSnap.data().location.lng);
     } else {
       console.log("No such document!");
     }
@@ -62,12 +68,12 @@ const saveCompetition = async()=>{
     // setting the start date
     var startDate = new Date(); // Now
     startDate.setDate(startDate.getDate() + 30); // Set now + 30 days as the new date
-    console.log("start"+startDate);
+    // console.log("start"+startDate);
 
         // setting the end date
         var endDate = new Date(); // Now
         endDate.setDate(endDate.getDate() + 60); // Set now + 30 days as the new date
-        console.log("end"+endDate);
+        // console.log("end"+endDate);
 
 
     const data = {
@@ -81,16 +87,25 @@ const saveCompetition = async()=>{
 }
 
     useEffect(()=>{
-        fetchAllCompetitions();
+        // fetchAllCompetitions();
         getAUser();
+
       },[]);
+
+    //   useEffect(()=>{
+    //     // fetchAllCompetitions();
+    //     getRegion();
+    //     console.log(lat)
+
+    //   },[userData.location]);
 
       useFocusEffect(
         React.useCallback(()=>{
             //do something when the screen is focussed
             // listenToData();
 
-            fetchAllCompetitions();
+            // fetchAllCompetitions();
+            getRegion();
 
             const collectionRef=query(collection(db, 'users'), where("uid","==", id));
 
@@ -122,12 +137,35 @@ const saveCompetition = async()=>{
 // console.log(userData[0].powerup);
 // console.log(userData[0].avatar)
     
-      const fetchAllCompetitions = async()=>{
-        const data = await getAllCompetitions();
-        console.log(data);
-        setCompetitions(data);
+    //   const fetchAllCompetitions = async()=>{
+    //     const data = await getAllCompetitions();
+    //     // console.log(data);
+    //     setCompetitions(data);
 
+    //   }
+
+      const getRegion = async () => {
+
+        if(lat!==0){
+         try {
+        //geonames api to find the region of your location
+         const response = await fetch("http://api.geonames.org/countryCodeJSON?lat="+lat+"&lng="+lng+"&username=isla.just");
+         const json = await response.json();
+         console.log(json);
+         setYourRegion(json.countryName);
+         console.log(yourRegion);
+       } catch (error) {
+         console.error(error);
+       }  finally {
+        setLoading(false);
       }
+        }else{
+            console.log("location not loaded")
+        }
+    
+     }
+
+    //   console.log(userData);
       
   return (
 
@@ -214,7 +252,15 @@ const saveCompetition = async()=>{
         <View style={styles.yourMins}>
      
             <Text style={styles.yourMins2}>your region</Text>
-            <Text style={styles.yourMins1}>South Africa</Text>
+
+       
+            { isLoading ?  
+    (
+     <ActivityIndicator color='#ffffff'/> //will render while loading
+    ) : (
+            <Text style={styles.yourMins1}>{yourRegion}</Text>
+        ) }
+          
         </View>
 
         <TouchableOpacity style={styles.btn2} onPress={onSignOutPress}><Text style={styles.btnTxt}>Log out</Text></TouchableOpacity>

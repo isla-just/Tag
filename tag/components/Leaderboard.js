@@ -1,7 +1,10 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard, ScrollView } from 'react-native';
 import back from '../assets/back.png';
 import avatar from '../assets/avatar.png';
+import { getActiveCompetition } from '../services/Database';
+import { getAllParticipants } from '../services/Database';
+import { getTopThree } from '../services/Database';
 
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
@@ -23,6 +26,33 @@ export default function Leaderboard({route, navigation}) {
   const avatar=userData.avatar;
   const points=userData.points;
   const username=userData.username;
+  const [comp, setComp]=useState([]);
+  const [users, setPeople]=useState([]);
+  const [top3, setTop3]=useState([]);
+
+  //getting the active competition id
+  const compDetails = async ()=>{
+      const activeComp = await getActiveCompetition();
+      setComp(activeComp);
+  }
+
+  useEffect(() => {
+      compDetails();
+      getParticipants();
+  },[])
+
+    //getting the active competition id
+    const getParticipants = async ()=>{
+      console.log(comp.uid);
+      const participants = await getAllParticipants(comp.uid);
+      setPeople(participants);
+
+      const top = users.slice(0, 3)
+      console.log(top);
+      setTop3(top);
+  }
+
+
 
   return (
 
@@ -42,6 +72,7 @@ export default function Leaderboard({route, navigation}) {
             </ScrollView>
 
             <View style={styles.leaderboardWrapper}>
+              
             <View>
                    <Image source={leaderboard1} style={styles.leaderboard1} />
                    <Text style={styles.name}>Jeanie</Text>
@@ -68,57 +99,38 @@ export default function Leaderboard({route, navigation}) {
 
         <View   style={styles.avatar}>
       <Avatar
-        size={52}
+        size={43}
         name={avatar}
         variant="beam"
         colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
         />
       </View>
 
-        <Text style={styles.place}>21st</Text>
+        <Text style={styles.place}>3</Text>
         <Text style={styles.username}>{username}</Text>
         <Text style={styles.score}>{points}pts</Text>
         </View>
 
 {/* everyone else */}
 
-<View style={styles.else}>
-        <Image source={leaderboard2} style={styles.avatar} />
-        <Text style={styles.place}>1st</Text>
-        <Text style={styles.username}>DavidJ</Text>
-        <Text style={styles.score}>21pts</Text>
+{users.map((user, index) => (
+
+<View key={index} style={styles.else}>
+
+        <View   style={styles.avatar}>
+      <Avatar
+        size={43}
+        name={user.avatar}
+        variant="beam"
+        colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+        />
+      </View>
+
+        <Text style={styles.place}>{index}</Text>
+        <Text style={styles.username}>{user.username}</Text>
+        <Text style={styles.score}>{user.points} pts</Text>
         </View>
-
-
-<View style={styles.else}>
-        <Image source={leaderboard1} style={styles.avatar} />
-        <Text style={styles.place}>2nd</Text>
-        <Text style={styles.username}>Jeanie</Text>
-        <Text style={styles.score}>21pts</Text>
-        </View>
-
-        <View style={styles.else}>
-        <Image source={leaderboard3} style={styles.avatar} />
-        <Text style={styles.place}>3rd</Text>
-        <Text style={styles.username}>YoYo</Text>
-        <Text style={styles.score}>21pts</Text>
-        </View>
-
-        <View style={styles.else}>
-        <Image source={avatar} style={styles.avatar} />
-        <Text style={styles.place}>3rd</Text>
-        <Text style={styles.username}>YoYo</Text>
-        <Text style={styles.score}>21pts</Text>
-        </View>
-
-        <View style={styles.else}>
-        <Image source={avatar} style={styles.avatar} />
-        <Text style={styles.place}>3rd</Text>
-        <Text style={styles.username}>YoYo</Text>
-        <Text style={styles.score}>21pts</Text>
-        </View>
-
-        <View style={styles.padding}></View>
+))}
 
         </ScrollView>
         
@@ -227,14 +239,17 @@ content:{
   },avatar:{
     height:52,
     width:52,
+    borderWidth:5,
+    borderColor:"#fff",
+    borderRadius:100
   },place:{
-    width:60,
+    width:35,
     color:'#FFFBEB',
     fontFamily:'semiBold',
     fontSize:25,
     marginLeft:15
   }, username:{
-    width:80,
+    width:100,
     color:'#FFFBEB',
     fontFamily:'medium',
     fontSize:15,

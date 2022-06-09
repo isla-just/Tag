@@ -1,6 +1,7 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
+import { getActiveCompetition } from '../services/Database';
 import { addParticipant } from '../services/Database';
 import { auth } from '../Firebase';
 
@@ -20,11 +21,28 @@ export default function Join({route, navigation}) {
     const points=userData.points;
     const username=userData.username;
     const id=userData.uid;
+    const [comp, setComp]=useState([]);
 
     console.log(userData);
+
+    const compDetails = async ()=>{
+        const activeComp = await getActiveCompetition();
+        setComp(activeComp);
+    }
+
+    useEffect(() => {
+        compDetails();
+    },[])
+
+    // const fetchAllUsers = async()=>{
+    //     const data = await getAllUsers();
+    //     // console.log(data);
+    //     setUsers(data);
+    //     setIsLoading(false);
+    //   }
     
     const AddParticipant = async ()=>{
-        addParticipant({avatar, points, username},id)
+        addParticipant({avatar, points, username},comp.uid)
     
         navigation.navigate("Waiting");
     }
