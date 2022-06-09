@@ -6,6 +6,7 @@ import avatar from '../assets/avatar.png';
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
+import Avatar from 'react-native-boring-avatars';
 
 import * as Font from 'expo-font';
 
@@ -16,9 +17,14 @@ Font.loadAsync({
     'semiBold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
   });
 
-export default function Leaderboard({navigation}) {
-  return (
+export default function Leaderboard({route, navigation}) {
 
+  const userData=route.params;
+  const avatar=userData.avatar;
+  const points=userData.points;
+  const username=userData.username;
+
+  return (
 
         <ScrollView style={styles.content}>
             <View style={styles.orange}></View>
@@ -59,10 +65,19 @@ export default function Leaderboard({navigation}) {
 
 {/* you */}
         <View style={styles.you}>
-        <Image source={avatar} style={styles.avatar} />
+
+        <View   style={styles.avatar}>
+      <Avatar
+        size={52}
+        name={avatar}
+        variant="beam"
+        colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+        />
+      </View>
+
         <Text style={styles.place}>21st</Text>
-        <Text style={styles.username}>isla.just</Text>
-        <Text style={styles.score}>12pts</Text>
+        <Text style={styles.username}>{username}</Text>
+        <Text style={styles.score}>{points}pts</Text>
         </View>
 
 {/* everyone else */}

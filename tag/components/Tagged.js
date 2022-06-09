@@ -8,6 +8,7 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import {db} from "../Firebase";
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where } from "firebase/firestore";
+import Avatar from 'react-native-boring-avatars';
 
 import * as Font from 'expo-font';
 import { updateTag } from '../services/Database';
@@ -30,7 +31,7 @@ export default function Tagged({route, navigation}) {
 
     //using the use states to set the new data
     await updateTag(auth.currentUser.uid,{tag:false});
-    await settag(params.uid, {tag:true, tagCount:+1});
+    await settag(params.uid, {tag:true, tagCount:+1, points:+1});
     // setNewTag();
 
     console.log("status has changed");
@@ -50,7 +51,15 @@ export default function Tagged({route, navigation}) {
   return (
     <View style={styles.container}>
           <Image source={logo} style={styles.logo} />
-          <View style={styles.imgcontainer}><Image source={leaderboard1} style={styles.avatar}/></View>
+  <View   style={styles.imgcontainer}>
+      <Avatar
+        size={100}
+        name={params.avatar}
+        variant="beam"
+        colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+        />
+</View>
+      
           <Text style={styles.header}>{params.username} has been tagged</Text>
           <Text style={styles.sub}>{params.points} points</Text>
 

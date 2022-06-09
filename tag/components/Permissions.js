@@ -45,7 +45,7 @@ export default function Permissions({navigation}) {
           <Text style={styles.sub}>So here's the deal...</Text>
           <Text style={styles.header}>We need to use your location so you can play tag with people all over the world</Text>
 
-          <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Tag")}>
+          <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Home")}>
             <Text style={styles.btntxt}>I understand</Text> 
             <Image source={arrow} style={styles.arrow} />
           </TouchableOpacity>

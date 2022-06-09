@@ -187,13 +187,6 @@ const Tag = ({navigation})=> {
 
   const [loading, setLoading]=useState(true);
 
-  const tokyoRegion = {
-    latitude: -26.028729549982025,
-    longitude: 28.099804136853543,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
-
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -369,7 +362,8 @@ setAllUsers(matchingDocs);
 
         {allUsers.map((item, index)=>(
 
-        <Marker key={index} title={item.username} coordinate={{latitude:item.location.lat, longitude:item.location.lng}} onPress={()=> navigation.navigate("Tagged" , item)}/>
+        <Marker key={index} title={item.username} pinColor={'#FB5E1B'} coordinate={{latitude:item.location.lat, longitude:item.location.lng}} onPress={()=> navigation.navigate("Tagged" , item)} 
+        />
           
               //  <Marker key={index} coordinate={{
                 

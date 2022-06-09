@@ -7,6 +7,8 @@ import express from '../assets/expression.png';
 import leaderboard1 from '../assets/leaderboard1.png';
 import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
+import { useFocusEffect } from '@react-navigation/native'
+import {onSnapshot } from 'firebase/firestore'
 
 import { getAllCompetitions } from '../services/Database';
 import { newCompetition } from '../services/Database';
@@ -14,6 +16,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../Firebase';
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
 import {db} from "../Firebase";
+import Tag from './Tag'
 
 import * as Font from 'expo-font';
 import Avatar from 'react-native-boring-avatars';
@@ -29,7 +32,8 @@ export default function Home({navigation}) {
 
     const [competitions, setCompetitions]=useState([]);
     const [userData, setUserData]=useState([]);
-    const [tagged, setTagged]=useState(false);
+    const id=auth.currentUser.uid;
+    // const [tagged, setTagged]=useState(false);
 
     const onSignOutPress = () =>{
         signOut(auth).then(() =>{
@@ -43,19 +47,11 @@ export default function Home({navigation}) {
 //get all the user documents
 const getAUser= async ()=>{
 
-    id=auth.currentUser.uid;
-
     const docRef = doc(db, "users", id);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       setUserData(docSnap.data());
-
-      if(userData.tag=true){
-          setTagged(true);
-      }else{
-        setTagged(false);
-      }
     } else {
       console.log("No such document!");
     }
@@ -88,6 +84,43 @@ const saveCompetition = async()=>{
         fetchAllCompetitions();
         getAUser();
       },[]);
+
+      useFocusEffect(
+        React.useCallback(()=>{
+            //do something when the screen is focussed
+            // listenToData();
+
+            fetchAllCompetitions();
+
+            const collectionRef=query(collection(db, 'users'), where("uid","==", id));
+
+            const unsub = onSnapshot(collectionRef, (snapshot)=>{
+                let users=[];
+                snapshot.forEach((doc)=>{
+
+                    let user={...doc.data(), id:doc.id}
+
+                    users.push(user);
+                    // console.log(users);
+
+                    if(user.tag==true){
+                        navigation.navigate("Tag");
+                      }
+                });
+
+                // setUserData(users);
+
+            })
+
+            return()=>{
+                //do something here when the sacreen is focussed
+                unsub();
+            }
+        },[])
+    )
+
+// console.log(userData[0].powerup);
+// console.log(userData[0].avatar)
     
       const fetchAllCompetitions = async()=>{
         const data = await getAllCompetitions();
@@ -96,8 +129,8 @@ const saveCompetition = async()=>{
 
       }
       
-
   return (
+
     <ScrollView style={styles.container}>
         <View style={styles.circleBg}></View>
 
@@ -160,7 +193,7 @@ const saveCompetition = async()=>{
      
         </View>
 
-        <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Leaderboard")}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={()=> navigation.navigate("Leaderboard", userData)}><Text style={styles.btnTxt}>See leaderboard</Text></TouchableOpacity>
 
         <Text style={styles.section}>Your game stats</Text>
 
@@ -191,6 +224,7 @@ const saveCompetition = async()=>{
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
  
