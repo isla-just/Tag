@@ -8,7 +8,8 @@ import { GeoPoint} from "firebase/firestore";
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import {db} from "../Firebase";
-import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs } from "firebase/firestore";
+import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where } from "firebase/firestore";
+
 
 const geofire = require('geofire-common');
 

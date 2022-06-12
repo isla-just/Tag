@@ -2,6 +2,7 @@ import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
 import { getActiveCompetition } from '../services/Database';
+import { getAllParticipants } from '../services/Database';
 import { addParticipant } from '../services/Database';
 import { auth } from '../Firebase';
 
@@ -22,17 +23,43 @@ export default function Join({route, navigation}) {
     const username=userData.username;
     const id=userData.uid;
     const [comp, setComp]=useState([]);
+    const [count, setCount]=useState(0);
 
-    console.log(userData);
+    // console.log(userData);
 
     const compDetails = async ()=>{
         const activeComp = await getActiveCompetition();
+        // console.log(activeComp);
         setComp(activeComp);
+
+        // console.log(activeComp.startDate)
+
+var start = new Date(activeComp.startDate);
+
+const currentDayOfMonth = start.getDate();
+const currentMonth = start.getMonth(); // Be careful! January is 0, not 1
+const currentYear = start.getFullYear();
+
+const dateString = currentDayOfMonth + "-" + (currentMonth + 1) + "-" + currentYear;
+console.log(dateString);
     }
 
+
+
     useEffect(() => {
+
+        //counter of participants
+
+        const getCountParticipants = async ()=>{
+            const participants = await getAllParticipants(comp.uid);
+
+            setCount(participants.length);
+        }
+
+        getCountParticipants();
+
         compDetails();
-    },[])
+    },[comp.uid])
 
     // const fetchAllUsers = async()=>{
     //     const data = await getAllUsers();
@@ -57,7 +84,7 @@ export default function Join({route, navigation}) {
 
             {/* // orange circle */}
         <View style={styles.orange}>
-            <Text style={styles.orange1}>255</Text>
+            <Text style={styles.orange1}>{count}</Text>
             <Text style={styles.orange2}>people playing</Text>
         </View>
 

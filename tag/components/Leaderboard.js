@@ -28,32 +28,59 @@ export default function Leaderboard({route, navigation}) {
   const username=userData.username;
   const [comp, setComp]=useState([]);
   const [users, setPeople]=useState([]);
-  const [top3, setTop3]=useState([]);
+
+  // /workaround data storage
+  const [firstAvatar, setFirstAvatar]=useState("");
+  const [firstUname, setFirstUname]=useState("");
+  const [firstPts, setFirstPts]=useState(0);
+
+  const [secondAvatar, setSecondAvatar]=useState("");
+  const [secondUname, setSecondUname]=useState("");
+  const [secondPts, setSecondPts]=useState(0);
+
+  const [thirdAvatar, setThirdAvatar]=useState("");
+  const [thirdUname, setThirdUname]=useState("");
+  const [thirdPts, setThirdPts]=useState(0);
 
   //getting the active competition id
   const compDetails = async ()=>{
       const activeComp = await getActiveCompetition();
       setComp(activeComp);
+
+      // getParticipants();
   }
 
+  var counter=0;
   useEffect(() => {
-      compDetails();
+
+    compDetails();
+
+        //getting the active competition id
+        const getParticipants = async ()=>{
+          const participants = await getAllParticipants(comp.uid);
+
+          setFirstPts(participants[0].points)
+          setFirstUname(participants[0].username)
+          setFirstAvatar(participants[0].avatar)
+
+          setSecondPts(participants[1].points)
+          setSecondUname(participants[1].username)
+          setSecondAvatar(participants[1].avatar)
+
+          setThirdPts(participants[2].points)
+          setThirdUname(participants[2].username)
+          setThirdAvatar(participants[2].avatar)
+          // setFirstPts(participants.points);
+
+          setPeople(participants);
+    
+
+      }
+
       getParticipants();
-  },[])
 
-    //getting the active competition id
-    const getParticipants = async ()=>{
-      console.log(comp.uid);
-      const participants = await getAllParticipants(comp.uid);
-      setPeople(participants);
-
-      const top = users.slice(0, 3)
-      console.log(top);
-      setTop3(top);
-  }
-
-
-
+  },[comp.uid])
+  
   return (
 
         <ScrollView style={styles.content}>
@@ -71,23 +98,48 @@ export default function Leaderboard({route, navigation}) {
               <Text style={styles.inactive}>Most tags</Text> */}
             </ScrollView>
 
+
             <View style={styles.leaderboardWrapper}>
               
             <View>
-                   <Image source={leaderboard1} style={styles.leaderboard1} />
-                   <Text style={styles.name}>Jeanie</Text>
-                   <Text style={styles.pts}>41pts</Text>
+
+            <View   style={styles.leaderboard1}>
+            <Avatar
+              size={75}
+              name={secondAvatar}
+              variant="beam"
+              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+              />
+            </View>
+
+                   <Text style={styles.name}>{secondUname}</Text>
+                   <Text style={styles.pts}>{secondPts} pts</Text>
             </View>
      <View>
-           <Image source={leaderboard2} style={styles.leaderboard2} />
-           <Text style={styles.name}>DavidJ</Text>
-            <Text style={styles.pts}>21pts</Text>
+
+          <View   style={styles.leaderboard2}>
+            <Avatar
+              size={102}
+              name={firstAvatar}
+              variant="beam"
+              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+              />
+            </View>
+           <Text style={styles.name}>{firstUname}</Text>
+            <Text style={styles.pts}>{firstPts} pts</Text>
      </View>
       
       <View>
-             <Image source={leaderboard3} style={styles.leaderboard3} />
-             <Text style={styles.name}>YoYo</Text>
-                   <Text style={styles.pts}>20pts</Text>
+      <View   style={styles.leaderboard3}>
+            <Avatar
+              size={75}
+              name={thirdAvatar}
+              variant="beam"
+              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+              />
+            </View>
+             <Text style={styles.name}>{thirdUname}</Text>
+                   <Text style={styles.pts}>{thirdPts} pts</Text>
       </View>
      
         </View>
@@ -141,8 +193,10 @@ export default function Leaderboard({route, navigation}) {
 const styles = StyleSheet.create({
  
 content:{
-
-        padding:40,
+        paddingLeft:40,
+        paddingRight:40,
+        paddingTop:40,
+        paddingBottom:400,
         flex:1,
         backgroundColor: '#FFFBEB'
       },
@@ -220,14 +274,16 @@ content:{
       fontSize:15,
       fontFamily:'semibold',
       textAlign:'center',
-      marginTop:10
+      marginTop:10,
+      color:"#fff"
   },pts:{
       fontSize:15,
       fontFamily:'medium',
       textAlign:'center',
-      marginTop:2
+      marginTop:2,
+      color:"#fff"
   }, you:{
-    backgroundColor:"#FFA6BA",
+    backgroundColor:"#F583B4",
     flex:1,
     maxHeight:75,
     borderRadius:75,
@@ -259,7 +315,7 @@ content:{
     fontFamily:'medium',
     fontSize:15,
   }, else:{
-    backgroundColor:"#FFD0D2",
+    backgroundColor:"#FFA6BA",
     flex:1,
     maxHeight:75,
     borderRadius:75,

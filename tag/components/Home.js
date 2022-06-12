@@ -11,7 +11,10 @@ import { useFocusEffect } from '@react-navigation/native'
 import {onSnapshot } from 'firebase/firestore'
 
 import { getAllCompetitions } from '../services/Database';
+import { getActiveCompetition } from '../services/Database';
+import { getAllParticipants } from '../services/Database';
 import { newCompetition } from '../services/Database';
+import { getTagged } from '../services/Database';
 import { signOut } from 'firebase/auth';
 import { auth } from '../Firebase';
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
@@ -33,10 +36,66 @@ export default function Home({navigation}) {
     const [competitions, setCompetitions]=useState([]);
     const [userData, setUserData]=useState([]);
     const [yourRegion, setYourRegion]=useState([]);
+    const [tagRegion, setTagRegion]=useState([]);
     const id=auth.currentUser.uid;
     const [isLoading, setLoading]=useState(true);
-    const [lng, setLng]=useState(0);
-    const [lat, setLat]=useState(0);
+    const [active, setActive]=useState(0);
+
+      // /workaround data storage
+  const [firstAvatar, setFirstAvatar]=useState("");
+  const [firstUname, setFirstUname]=useState("");
+  const [firstPts, setFirstPts]=useState(0);
+
+  const [secondAvatar, setSecondAvatar]=useState("");
+  const [secondUname, setSecondUname]=useState("");
+  const [secondPts, setSecondPts]=useState(0);
+
+  const [thirdAvatar, setThirdAvatar]=useState("");
+  const [thirdUname, setThirdUname]=useState("");
+  const [thirdPts, setThirdPts]=useState(0);
+
+  const [comp, setComp]=useState([]);
+  const [users, setPeople]=useState([]);
+
+
+  //getting the active competition id
+  const compDetails = async ()=>{
+    const activeComp = await getActiveCompetition();
+    setComp(activeComp);
+
+    // getParticipants();
+}
+
+useEffect(() => {
+
+  compDetails();
+
+      //getting the active competition id
+      const getParticipants = async ()=>{
+        const participants = await getAllParticipants(comp.uid);
+
+        setFirstPts(participants[0].points)
+        setFirstUname(participants[0].username)
+        setFirstAvatar(participants[0].avatar)
+
+        setSecondPts(participants[1].points)
+        setSecondUname(participants[1].username)
+        setSecondAvatar(participants[1].avatar)
+
+        setThirdPts(participants[2].points)
+        setThirdUname(participants[2].username)
+        setThirdAvatar(participants[2].avatar)
+        // setFirstPts(participants.points);
+
+        setPeople(participants);
+  
+
+    }
+
+    getParticipants();
+
+},[comp.uid])
+
     // const [tagged, setTagged]=useState(false);
 
     const onSignOutPress = () =>{
@@ -56,8 +115,9 @@ const getAUser= async ()=>{
     
     if (docSnap.exists()) {
       setUserData(docSnap.data());
-      setLat(docSnap.data().location.lat);
-      setLng(docSnap.data().location.lng);
+
+    //   setLat(docSnap.data().location.lat);
+    //   setLng(docSnap.data().location.lng);
     } else {
       console.log("No such document!");
     }
@@ -83,6 +143,7 @@ const saveCompetition = async()=>{
         status:"inactive",
     }
 
+
      await newCompetition(data);
 }
 
@@ -90,22 +151,57 @@ const saveCompetition = async()=>{
         // fetchAllCompetitions();
         getAUser();
 
-      },[]);
+        const getRegion = async () => {
+         
+            try {
+           //geonames api to find the region of your location
+            const response = await fetch("http://api.geonames.org/countryCodeJSON?lat="+userData.location.lat+"&lng="+userData.location.lng+"&username=isla.just");
+            const json = await response.json();
+            // console.log(json);
+            setTagRegion(json.countryName);
+          } catch (error) {
+            console.error(error);
+          }  finally {
+           setLoading(false);
+         }
+       
+        }
 
-    //   useEffect(()=>{
-    //     // fetchAllCompetitions();
-    //     getRegion();
-    //     console.log(lat)
+        getRegion();
+  
 
-    //   },[userData.location]);
+      },[userData.uid]);
+
+      useEffect(() => {
+        getTagRegion();
+
+        const getTaggedRegion = async () => {
+         
+            try {
+           //geonames api to find the region of your location
+            const response = await fetch("http://api.geonames.org/countryCodeJSON?lat="+active.location.lat+"&lng="+active.location.lng+"&username=isla.just");
+            const json = await response.json();
+            // console.log(json);
+            setYourRegion(json.countryName);
+          } catch (error) {
+            console.error(error);
+          }  finally {
+           setLoading(false);
+         }
+       
+        }
+
+        getTaggedRegion();
+      },[active.uid])
+
+      const getTagRegion = async()=>{
+        const activeComp = await getTagged();
+        // console.log(activeComp);
+        setActive(activeComp);
+      }
 
       useFocusEffect(
         React.useCallback(()=>{
-            //do something when the screen is focussed
-            // listenToData();
-
-            // fetchAllCompetitions();
-            getRegion();
 
             const collectionRef=query(collection(db, 'users'), where("uid","==", id));
 
@@ -117,13 +213,12 @@ const saveCompetition = async()=>{
 
                     users.push(user);
                     // console.log(users);
+                    
 
                     if(user.tag==true){
                         navigation.navigate("Tag");
                       }
                 });
-
-                // setUserData(users);
 
             })
 
@@ -134,38 +229,6 @@ const saveCompetition = async()=>{
         },[])
     )
 
-// console.log(userData[0].powerup);
-// console.log(userData[0].avatar)
-    
-    //   const fetchAllCompetitions = async()=>{
-    //     const data = await getAllCompetitions();
-    //     // console.log(data);
-    //     setCompetitions(data);
-
-    //   }
-
-      const getRegion = async () => {
-
-        if(lat!==0){
-         try {
-        //geonames api to find the region of your location
-         const response = await fetch("http://api.geonames.org/countryCodeJSON?lat="+lat+"&lng="+lng+"&username=isla.just");
-         const json = await response.json();
-         console.log(json);
-         setYourRegion(json.countryName);
-         console.log(yourRegion);
-       } catch (error) {
-         console.error(error);
-       }  finally {
-        setLoading(false);
-      }
-        }else{
-            console.log("location not loaded")
-        }
-    
-     }
-
-    //   console.log(userData);
       
   return (
 
@@ -190,7 +253,7 @@ const saveCompetition = async()=>{
 {/* pink circle */}
         <View style={styles.where}>
             <Text style={styles.where1}>tag is in</Text>
-            <Text style={styles.where2}>South Africa</Text>
+            <Text style={styles.where2}>{tagRegion}</Text>
         </View>
 
 {/* yellow circle */}
@@ -213,20 +276,41 @@ const saveCompetition = async()=>{
         <Text style={styles.section}>Current game</Text>
         <View style={styles.leaderboardWrapper}>
             <View>
-                   <Image source={leaderboard1} style={styles.leaderboard1} />
-                   <Text style={styles.name}>Jeanie</Text>
-                   <Text style={styles.pts}>41pts</Text>
+            <View   style={styles.leaderboard1}>
+                    <Avatar
+                    size={75}
+                    name={secondAvatar}
+                    variant="beam"
+                    colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+                    />
+            </View>
+                   <Text style={styles.name}>{secondUname}</Text>
+                   <Text style={styles.pts}>{secondPts} pts</Text>
             </View>
      <View>
-           <Image source={leaderboard2} style={styles.leaderboard2} />
-           <Text style={styles.name}>DavidJ</Text>
-            <Text style={styles.pts}>21pts</Text>
+     <View   style={styles.leaderboard2}>
+            <Avatar
+              size={102}
+              name={firstAvatar}
+              variant="beam"
+              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+              />
+            </View>
+           <Text style={styles.name}>{firstUname}</Text>
+            <Text style={styles.pts}>{firstPts} pts</Text>
      </View>
       
       <View>
-             <Image source={leaderboard3} style={styles.leaderboard3} />
-             <Text style={styles.name}>YoYo</Text>
-                   <Text style={styles.pts}>20pts</Text>
+      <View   style={styles.leaderboard3}>
+                    <Avatar
+                    size={75}
+                    name={thirdAvatar}
+                    variant="beam"
+                    colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+                    />
+            </View>
+             <Text style={styles.name}>{thirdUname}</Text>
+                   <Text style={styles.pts}>{thirdPts} pts</Text>
       </View>
      
         </View>
@@ -254,12 +338,7 @@ const saveCompetition = async()=>{
             <Text style={styles.yourMins2}>your region</Text>
 
        
-            { isLoading ?  
-    (
-     <ActivityIndicator color='#ffffff'/> //will render while loading
-    ) : (
             <Text style={styles.yourMins1}>{yourRegion}</Text>
-        ) }
           
         </View>
 
@@ -397,7 +476,7 @@ textAlign:'left'
    fontFamily:'semiBold',
    marginHorizontal:20,
    marginTop:30,
-   marginBottom:10
+   marginBottom:25
   },leaderboardWrapper:{
     width:"100%",
     flexDirection:'row',
@@ -535,3 +614,23 @@ textAlign:'center'
 
 }
 });
+
+
+// onSnapshot(
+//     query(scorecardCollectionRef, orderBy("finalscore", "asc")),
+//     (snapshot) => {
+//       let scores = [];
+
+//       snapshot.forEach((doc) => {
+//         scores.push({
+//           ...allusers[doc.data().uid],
+//           ...doc.data(),
+//         });
+//       });
+
+//       ///want to use scores[0].uid
+//       setscoreCards(scores);
+
+
+//     }
+//   );

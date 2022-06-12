@@ -29,7 +29,7 @@ export default function Login({navigation}) {
         .then((userCredentials) =>{
             //when successful
             const user = userCredentials.user;
-            Alert.alert(user.uid);
+            // Alert.alert(user.uid);
 
             navigation.navigate("Permissions");
         })

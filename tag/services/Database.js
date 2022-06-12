@@ -40,7 +40,7 @@ export const getActiveCompetition= async ()=>{
     //snapshot for our users collection
     const querySnapshot = await getDocs(collection(db, 'competitions'), where("status", "==", "active"));
 
-    var allData={};
+    var allData=[];
     // const date = dateCreated.toDate().toDateString()
 
     querySnapshot.forEach((doc)=>{
@@ -122,3 +122,21 @@ collectionSnapshot.forEach((doc)=>{
 });
 return participants;
 }
+
+export const getTagged=async (id)=>{
+    
+    const querySnapshot = await getDocs(collection(db, 'users'), where("tag", "==", true));
+    var allData=[];
+    // const date = dateCreated.toDate().toDateString()
+
+    querySnapshot.forEach((doc)=>{
+    const compData={
+        location:doc.data().location,
+        uid:doc.data().uid
+    }
+
+    allData=compData;
+})
+
+return allData;
+    }
