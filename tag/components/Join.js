@@ -32,16 +32,17 @@ export default function Join({route, navigation}) {
         // console.log(activeComp);
         setComp(activeComp);
 
-        // console.log(activeComp.startDate)
+const fetchedDate= activeComp.startDate;
 
-var start = new Date(activeComp.startDate);
+var today=new Date(activeComp.fetchedDate);
+console.log(today);
 
-const currentDayOfMonth = start.getDate();
-const currentMonth = start.getMonth(); // Be careful! January is 0, not 1
-const currentYear = start.getFullYear();
+// var today = new Date();
+// var dd = String(today.getDate()).padStart(2, '0');
+// var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+// var yyyy = today.getFullYear();
+// var today = new Date().getTime();
 
-const dateString = currentDayOfMonth + "-" + (currentMonth + 1) + "-" + currentYear;
-console.log(dateString);
     }
 
 

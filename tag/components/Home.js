@@ -19,7 +19,10 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../Firebase';
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
 import {db} from "../Firebase";
-import Tag from './Tag'
+
+//formatting dates
+import CountDown from 'react-native-countdown-component';
+import moment from 'moment';
 
 import * as Font from 'expo-font';
 import Avatar from 'react-native-boring-avatars';
@@ -55,15 +58,18 @@ export default function Home({navigation}) {
   const [thirdPts, setThirdPts]=useState(0);
 
   const [comp, setComp]=useState([]);
-  const [users, setPeople]=useState([]);
-
+  const [endDate, setEndDate]=useState(Date);
+  const [totalDuration, setTotalDuration] = useState(0);
 
   //getting the active competition id
   const compDetails = async ()=>{
     const activeComp = await getActiveCompetition();
-    setComp(activeComp);
+    // console.log(activeComp.uid)
 
-    // getParticipants();
+    var end=activeComp.endDate;
+    setEndDate(end.toDate());
+
+    setComp(activeComp);
 }
 
 useEffect(() => {
@@ -87,14 +93,34 @@ useEffect(() => {
         setThirdAvatar(participants[2].avatar)
         // setFirstPts(participants.points);
 
-        setPeople(participants);
-  
-
+        // setPeople(participants);
     }
 
     getParticipants();
 
 },[comp.uid])
+
+useEffect(() => {
+    const getCountdown = async ()=>{
+        //setting the countdown 
+  
+      //   console.log("end date"+endDate);
+  
+          var thisdate = moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
+          var expiryDate = moment(endDate).utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
+  
+          var diffr = moment.duration(moment(expiryDate).diff(moment(thisdate)));
+  
+          var hours = parseInt(diffr.asHours());
+          var minutes = parseInt(diffr.minutes());
+          var seconds = parseInt(diffr.seconds());
+          var d = hours * 60 * 60 + minutes * 60 + seconds;
+          //converting in seconds
+          setTotalDuration(d);
+    };
+
+    getCountdown();
+},[endDate])
 
     // const [tagged, setTagged]=useState(false);
 
@@ -125,26 +151,26 @@ const getAUser= async ()=>{
 
 const saveCompetition = async()=>{
 
-    // setting the start date
-    var startDate = new Date(); // Now
-    startDate.setDate(startDate.getDate() + 30); // Set now + 30 days as the new date
-    // console.log("start"+startDate);
+    // // setting the start date
+    // var startDate = new Date(); // Now
+    // startDate.setDate(startDate.getDate() + 30); // Set now + 30 days as the new date
+    // // console.log("start"+startDate);
 
-        // setting the end date
-        var endDate = new Date(); // Now
-        endDate.setDate(endDate.getDate() + 60); // Set now + 30 days as the new date
-        // console.log("end"+endDate);
-
-
-    const data = {
-        endDate:endDate,
-        startDate:startDate,
-        prize:"technology",
-        status:"inactive",
-    }
+    //     // setting the end date
+    //     var endDate = new Date(); // Now
+    //     endDate.setDate(endDate.getDate() + 60); // Set now + 30 days as the new date
+    //     // console.log("end"+endDate);
 
 
-     await newCompetition(data);
+    // const data = {
+    //     endDate:endDate,
+    //     startDate:startDate,
+    //     prize:"technology",
+    //     status:"inactive",
+    // }
+
+
+    //  await newCompetition(data);
 }
 
     useEffect(()=>{
@@ -248,7 +274,7 @@ const saveCompetition = async()=>{
       
         
         <Text style={styles.header}>Hey hey!</Text>
-        <Text style={styles.body}>20 days and 4hrs left in the game</Text>
+        <Text style={styles.body}>Let's play a huge game of tag!</Text>
 
 {/* pink circle */}
         <View style={styles.where}>
@@ -263,11 +289,23 @@ const saveCompetition = async()=>{
         </TouchableOpacity>
 
 {/* orange shape */}
-        <TouchableOpacity onPress={()=> navigation.navigate("Powerup")}
-         style={styles.block}>
-            <Text style={styles.block1}>tag blocker</Text>
-            <Text style={styles.block2}>{userData.powerup}</Text>
-        </TouchableOpacity>
+        <View style={styles.block}>
+            <Text style={styles.block1}>Time left</Text>
+            <CountDown
+            until={totalDuration}
+            //duration of countdown in seconds
+            timetoShow={('H', 'M', 'S')}
+            //To Do: show completed screen here
+            onFinish={() => alert('The competition is over')}
+            //on Finish call
+            onPress={() => alert('hello')}
+            //on Press call
+            size={15}
+            digitStyle={{backgroundColor: '#FB5E1B'}}
+            digitTxtStyle={{color: '#FFFFFF'}}
+            timeLabelStyle={{color: '#fff', fontWeight: 'bold'}}
+            />
+        </View>
 
                 <TouchableOpacity style={styles.btn2} onPress={saveCompetition}><Text style={styles.btnTxt}>Generate new</Text></TouchableOpacity>
 
@@ -419,8 +457,8 @@ textAlign:'center'
     width:145,
     height:145,
     borderRadius:145,
-    marginLeft:10,
-    marginTop:-30,
+    marginLeft:-10,
+    marginTop:-70,
     alignItems: 'center',
     justifyContent:'center',
     padding:20
@@ -441,20 +479,23 @@ textAlign:'center'
     marginTop:3
 },block:{
     backgroundColor:"#FB5E1B",
-    width:250,
+    width:260,
     height:120,
     borderRadius:70,
-    marginLeft:170,
-    marginTop:-95,
+    marginLeft:140,
+    marginTop:-55,
     alignItems: 'center',
     justifyContent:'center',
-    padding:40
+    paddingTop:40,
+    paddingBottom:40,
+    paddingRight:60
 },block1:{
-    fontSize:17,
+    fontSize:15,
     width:'100%',
     color:'#FFFBEB',
     fontFamily:'medium',
-    marginHorizontal:10,
+    marginLeft:60,
+    marginTop:-5,
 textAlign:'left'
 },block2:{
     fontSize:20,
@@ -468,7 +509,7 @@ textAlign:'left'
     width: 33,
     height: 30,
     marginTop: 500,
-    marginLeft:150,
+    marginLeft:120,
     position:'absolute'
   },section:{
    color:'#000000',   
