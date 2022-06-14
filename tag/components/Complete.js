@@ -2,15 +2,11 @@ import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard, ScrollView } from 'react-native';
 import back from '../assets/back.png';
 import avatar from '../assets/avatar.png';
-import { getActiveCompetition, getCollectionListener } from '../services/Database';
+import { getActiveCompetition, setPowerup } from '../services/Database';
 import { getAllParticipants } from '../services/Database';
 import { getTopThree } from '../services/Database';
-import { useFocusEffect } from '@react-navigation/native'
-import { doc, onSnapshot } from 'firebase/firestore'
 
-import leaderboard1 from '../assets/leaderboard1.png';
-import leaderboard2 from '../assets/leaderboard2.png';
-import leaderboard3 from '../assets/leaderboard3.png';
+import overlay from '../assets/special.png';
 import Avatar from 'react-native-boring-avatars';
 
 import * as Font from 'expo-font';
@@ -22,169 +18,112 @@ Font.loadAsync({
     'semiBold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
   });
 
-export default function Leaderboard({route, navigation}) {
+export default function Complete({route, navigation}) {
 
   const userData=route.params;
   const avatar=userData.avatar;
   const points=userData.points;
   const username=userData.username;
+  const powerup=userData.powerup;
   const [comp, setComp]=useState([]);
   const [users, setPeople]=useState([]);
   const [compID, setCompID]=useState("");
-
-
-  // /workaround data storage
-  const [firstAvatar, setFirstAvatar]=useState("");
-  const [firstUname, setFirstUname]=useState("");
-  const [firstPts, setFirstPts]=useState(0);
-
-  const [secondAvatar, setSecondAvatar]=useState("");
-  const [secondUname, setSecondUname]=useState("");
-  const [secondPts, setSecondPts]=useState(0);
-
-  const [thirdAvatar, setThirdAvatar]=useState("");
-  const [thirdUname, setThirdUname]=useState("");
-  const [thirdPts, setThirdPts]=useState(0);
-
   const [place, setPlace]=useState(0);
+  const [special, setSpecial]=useState(false);
 
   //getting the active competition id
   const compDetails = async ()=>{
     const activeComp = await getActiveCompetition();
     setComp(activeComp[0]);
     setCompID(activeComp[0].uid);
-  }
+}
 
-  useFocusEffect(
-    React.useCallback(()=>{
+  //getting the active competition id
+  const powerupDetails = async ()=>{
+    await setPowerup(userData.uid, {powerup:"special"});
+}
+
+  useEffect(() => {
 
     compDetails();
 
-      const collectionRef=getCollectionListener(comp.uid);
+        //getting the active competition id
+        const getParticipants = async ()=>{
+          const participants = await getAllParticipants(comp.uid);
 
-      const unsub = onSnapshot(collectionRef, (snapshot)=>{
-        let participants=[];
-        snapshot.forEach((doc)=>{
-
-            let parData={...doc.data(), uid:doc.id}
-
-            // console.log(doc.data().features)
-            participants.push(parData);
-        })
-
-        for(i=0;i<participants.length;i++){
-          if(participants[i].uid==userData.uid){
-            setPlace(i+1);
-          }else{
-            console.log("not You")
+          for(i=0;i<participants.length;i++){
+            if(participants[i].uid==userData.uid){
+              setPlace(i+1);
+            }
           }
-        }
 
-        setPeople(participants);
+          setPeople(participants);
 
-        // setting places workaround
-        setFirstPts(participants[0].points)
-        setFirstUname(participants[0].username)
-        setFirstAvatar(participants[0].avatar)
+      }
 
-        setSecondPts(participants[1].points)
-        setSecondUname(participants[1].username)
-        setSecondAvatar(participants[1].avatar)
+      getParticipants();
 
-        setThirdPts(participants[2].points)
-        setThirdUname(participants[2].username)
-        setThirdAvatar(participants[2].avatar)
-    })
+  },[compID])
 
-    return()=>{
-        //do something here when the sacreen is focussed
-        unsub();
+  useEffect(() => {
+    const checkPowerup = async ()=>{
+      console.log(place);
+      if(place==1){
+        powerupDetails();
+        setSpecial(true);
+      }else{
+        console.log('sorry you dont win')
+      }
     }
-    },[comp.uid])
-    )
 
+    checkPowerup();
+  },[place])
   
   return (
 
         <ScrollView style={styles.content}>
             <View style={styles.orange}></View>
-            <TouchableOpacity style={styles.target} onPress={()=> navigation.navigate("Home")}>
-                     <Image source={back} style={styles.back} />
-            </TouchableOpacity>
-     
-            <Text style={styles.header}>Leaderboard</Text>
 
-            <ScrollView horizontal={true} style={styles.scrollable}>
-              <Text style={styles.active}>Overview</Text>
-              {/* <Text style={styles.inactive}>Tag time</Text>
-              <Text style={styles.inactive}>Least tags</Text>
-              <Text style={styles.inactive}>Most tags</Text> */}
-            </ScrollView>
+     { special ?  
+    (
+     <Image     
+     style={styles.overlay}
+     source={overlay}/>
+    ) : (
+      <View></View>
+    )}
 
-
-            <View style={styles.leaderboardWrapper}>
-              
-            <View>
-
-            <View   style={styles.leaderboard1}>
-            <Avatar
-              size={75}
-              name={secondAvatar}
-              variant="beam"
-              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
-              />
-            </View>
-
-                   <Text style={styles.name}>{secondUname}</Text>
-                   <Text style={styles.pts}>{secondPts} pts</Text>
-            </View>
-     <View>
-
-          <View   style={styles.leaderboard2}>
-            <Avatar
-              size={102}
-              name={firstAvatar}
-              variant="beam"
-              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
-              />
-            </View>
-           <Text style={styles.name}>{firstUname}</Text>
-            <Text style={styles.pts}>{firstPts} pts</Text>
-     </View>
-      
-      <View>
-      <View   style={styles.leaderboard3}>
-            <Avatar
-              size={75}
-              name={thirdAvatar}
-              variant="beam"
-              colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
-              />
-            </View>
-             <Text style={styles.name}>{thirdUname}</Text>
-                   <Text style={styles.pts}>{thirdPts} pts</Text>
-      </View>
-     
-        </View>
-
-{/* //player list */}
-
-{/* you */}
-        <View style={styles.you}>
-
-        <View   style={styles.avatar}>
+            <View   style={styles.yourAvatar}>
       <Avatar
-        size={43}
+        size={100}
         name={avatar}
         variant="beam"
         colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
         />
       </View>
+     
+            <Text style={styles.header}>The game is complete!</Text>
+            <Text style={styles.sub}>You placed in #{place} position</Text>
+            <Text style={styles.sub2}>This means the next competition has started. Get ready!</Text>
 
-        <Text style={styles.place}>{place}</Text>
-        <Text style={styles.username}>{username}</Text>
-        <Text style={styles.score}>{points}pts</Text>
-        </View>
+            <TouchableOpacity style={styles.btn2}  onPress={()=> navigation.navigate("Home")}><Text style={styles.btnTxt}>Back home</Text></TouchableOpacity>
+
+{/* you */}
+<View style={styles.you}>
+
+<View   style={styles.avatar}>
+<Avatar
+size={43}
+name={avatar}
+variant="beam"
+colors={['#FFD346', '#6C97FB', '#F583B4', '#FECE34', '#FFA6BA']}
+/>
+</View>
+
+<Text style={styles.place}>{place}</Text>
+<Text style={styles.username}>{username}</Text>
+<Text style={styles.score}>{points}pts</Text>
+</View>
 
 {/* everyone else */}
 
@@ -206,7 +145,9 @@ export default function Leaderboard({route, navigation}) {
         <Text style={styles.score}>{user.points} pts</Text>
         </View>
 ))}
+
 <View style={styles.spacing}></View>
+
         </ScrollView>
         
      
@@ -223,34 +164,38 @@ content:{
         flex:1,
         backgroundColor: '#FFFBEB'
       },
-      back: {
-        width: 20,
-        height: 17,
-        marginTop: 40,
-      },
     header:{
         color:'#FFFBEB',
         fontFamily:'semiBold',
         fontSize:30,
-        marginTop:10,
-        width:'80%',
-        marginLeft:50
+        marginTop:20,
+        width:'100%',
+        textAlign:'center'
     },
     sub:{
-        color:'#000',
+        color:'#fff',
+        fontFamily:'medium',
+        fontSize:20,
+        marginTop:20,
+        width:'100%',
+        textAlign:'center'
+    },
+    sub2:{
+        color:'#fff',
         fontFamily:'medium',
         fontSize:15,
-        marginTop:20,
-        marginHorizontal:40
+        marginTop:10,
+        width:'100%',
+        textAlign:'center'
     },
     orange:{
-        width:550,
-        height:550,
+        width:600,
+        height:600,
         position:'absolute',
-        marginTop:-130,
+        marginTop:-100,
         backgroundColor: '#FB5E1B',
-        borderRadius:550,
-        marginLeft:-125
+        borderRadius:600,
+        marginLeft:-150
     },scrollable:{
       flex: 5,
       maxHeight:70,
@@ -321,6 +266,14 @@ content:{
     borderWidth:5,
     borderColor:"#fff",
     borderRadius:100
+  },overlay:{
+    height:150,
+    width:150,
+    borderRadius:100,
+    position:'absolute',
+    marginTop:15,
+    marginLeft:72,
+    zIndex:2,
   },place:{
     width:35,
     color:'#FFFBEB',
@@ -359,8 +312,24 @@ content:{
     width:20,
     height:20,
     backgroundColor: '#FB5E1B'
-  },spacing:{
+  },yourAvatar:{
+    width:"100%",
+    alignItems: 'center',
+    marginTop:40
+  },btn2:{
     width:'100%',
-    height:100
-  }
+    padding:20,
+    backgroundColor:'#FECE34',
+    borderRadius:100,
+    marginTop:20,
+    marginBottom:20
+},btnTxt:{
+    color:'#FFFBEB',
+    fontFamily:'semibold',
+    textAlign:'center',
+    fontSize:18
+},spacing:{
+  width:'100%',
+  height:100
+}
 });

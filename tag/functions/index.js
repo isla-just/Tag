@@ -3,41 +3,47 @@ const firebase = require("firebase-admin");
 firebase.initializeApp()
 var firestore = firebase.firestore()
     
-//what needs to happen on the first of the month:
-//1. previous comptition needs to be marked as inactive - done by finding where active and updating it
-//2. then you need to mark the next competition as active - done by checking if its start date matches the current date
-//3. then you need to create the following competition by adding a month to the startdate
-//4. lastly, send out a push notification 
 
-//this works
-exports.timer = functions.pubsub
-.schedule("0 0 1 * *")
-.onRun(async (context) => {
+exports.taskRunner = functions.runWith( { memory: '2GB' }).region('europe-west1').pubsub
 
-    //first step - works
-    const comp = firestore.collection("competitions")
-    const status = await comp.where("status", "==", "active").get()
-    status.forEach(snapshot => {
-        snapshot.ref.update({ "status": "inactive" })
-    })
+    .schedule('0 0 1 * *')
+    .onRun(async (context) => {
 
-    //second step 
-    var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date("2022-06-13T22:00:00.000Z"));
+        // first step - works
+        const comp = firestore.collection("competitions")
+        const status = await comp.where("status", "==", "active").get()
+        status.forEach(snapshot => {
+            snapshot.ref.update({ "status": "inactive" })
+        })
+
+     //second step 
+    // var myTimestamp = firebase.firestore.Timestamp.fromDate(new Date("2022-06-13T22:00:00.000Z"));
+    var current = firebase.firestore.Timestamp.fromDate(new Date());
     // var current = new Date(firebase.firestore.Timestamp.now().seconds*1000).toLocaleDateString();
-    const setActive = await comp.where("startDate", "==", myTimestamp).get()
+    const setActive = await comp.where("startDate", "==", current).get()
     setActive.forEach(snapshot => {
         snapshot.ref.update({ "status": "active" })
         console.log("updated");
     })
 
-    //third step
-    //getting the first day of the next month
+        //third step
+    //getting the first day of the next month and the following month to create start and end dates
     const thisDate = new Date();
-    var startTimestamp = firebase.firestore.Timestamp.fromDate(new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 1));
-    var endTimestamp = firebase.firestore.Timestamp.fromDate(new Date(thisDate.getFullYear(), thisDate.getMonth() + 2, 1));
+    var startDate = (new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 1));
+    var startTimestamp = firebase.firestore.Timestamp.fromDate(new Date(startDate));
+    var endDate = (new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 2));
+    var endTimestamp = firebase.firestore.Timestamp.fromDate(new Date(endDate));
 
-console.log(startTimestamp);
-console.log(endTimestamp);
+    var newDocRef = doc(collection(firestore, 'competitions'));
+    await setDoc(
+    newDocRef,{
+                endDate:endTimestamp,
+                startDate:startTimestamp,
+                prize:'random',
+                status: 'inactive',
+                uid: newDocRef.id
+          }
+    );
 
-    return console.log(myTimestamp);
-})
+    return console.log("done");
+});

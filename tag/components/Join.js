@@ -1,12 +1,14 @@
 import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
-import { getActiveCompetition, getNextCompetition } from '../services/Database';
+import { getNextCompetition, getCollectionListener } from '../services/Database';
 import { getAllParticipants } from '../services/Database';
 import { addParticipant } from '../services/Database';
 import { auth } from '../Firebase';
 import moment from 'moment';
 import * as Font from 'expo-font';
+import { useFocusEffect } from '@react-navigation/native'
+import { doc, onSnapshot } from 'firebase/firestore'
 
 Font.loadAsync({
     // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
@@ -22,6 +24,7 @@ export default function Join({route, navigation}) {
     const points=userData.points;
     const username=userData.username;
     const uid=userData.uid;
+
     const [compID, setCompID] = useState("");
     const [comp, setComp]=useState([]);
     const [count, setCount]=useState(0);
@@ -29,60 +32,71 @@ export default function Join({route, navigation}) {
     const [startDate, setStartDate]=useState(Date);
     const [canEnter, setCanEnter]=useState(true);
 
-    // console.log(userData);
+  //getting the active competition id
+  const compDetails = async ()=>{
+    const activeComp = await getNextCompetition();
 
-    const compDetails = async ()=>{
-        const activeComp = await getNextCompetition();
-        console.log(activeComp);
+    // console.log(activeComp)
+    setComp(activeComp[0]);
+    setCompID(activeComp[0].uid);
 
-        var end=(activeComp.endDate).toDate();
-        var endFormatted = moment(end).utcOffset('+05:30').format('YYYY-MM-DD');
-        setEndDate(endFormatted);
+    var end=(activeComp[0].endDate).toDate();
+    var endFormatted = moment(end).utcOffset('+05:30').format('YYYY-MM-DD');
+    setEndDate(endFormatted);
 
-    var start=(activeComp.startDate).toDate();
+    var start=(activeComp[0].startDate).toDate();
     var startFormatted = moment(start).utcOffset('+05:30').format('YYYY-MM-DD');
     setStartDate(startFormatted);
-
-    setCompID(activeComp.uid);
-
-        setComp(activeComp);
     }
 
+    // useEffect(() => {
+    //     compDetails();
+    // })
 
 
-    useEffect(() => {
 
-        //counter of participants
+    useFocusEffect(
+        React.useCallback(()=>{
 
-        const getCountParticipants = async ()=>{
-            const participants = await getAllParticipants(comp.uid);
-            setCount(participants.length);
+            compDetails();
+            const collectionRef=getCollectionListener(comp.uid);
 
-            for(var i=0;i<participants.length;i++){
-                console.log(participants[i].uid)
-                if(participants[i].uid!==userData.uid){
-                    setCanEnter(false);
-                    console.log("not entered");
-                }else{
-                    setCanEnter(false);
-                    console.log("already entered");
+            const unsub = onSnapshot(collectionRef, (snapshot)=>{
+              let participants=[];
+              snapshot.forEach((doc)=>{
+      
+                  let parData={...doc.data()}
+                  participants.push(parData);
+              })
+
+              setCount(participants.length);
+              console.log(participants.length)
+
+              for(var i=0;i<participants.length;i++){
+                    if(participants[i].uid==userData.uid){
+                        setCanEnter(false);
+                        console.log("already entered");
+                    }else{
+                        console.log("can enter");
+                    }
+
                 }
-            }
 
-            // if(userData.uid==participants.uid){
+            })
 
-            // }
+        
+        return()=>{
+            //do something here when the sacreen is focussed
+            unsub();
         }
-
-        getCountParticipants();
-        compDetails();
-
-
-    },[comp.uid])
+        },[comp.uid])
+        )
     
     const AddParticipant = async ()=>{
-        await addParticipant(compID, {avatar, points, username, uid})
-        navigation.navigate({ name:'Waiting',
+        // console.log(comp.uid)
+        await addParticipant({avatar, points, username, uid}, comp.uid)
+        navigation.navigate({ 
+        name:'Waiting',
         params:startDate});
     }
 
@@ -97,7 +111,7 @@ export default function Join({route, navigation}) {
             {/* // orange circle */}
         <View style={styles.orange}>
             <Text style={styles.orange1}>{count}</Text>
-            <Text style={styles.orange2}>people playing</Text>
+            <Text style={styles.orange2}>people entered</Text>
         </View>
 
                     {/* // pink circle */}

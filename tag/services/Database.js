@@ -1,5 +1,6 @@
 //we will be adding our db queries and functions 
 import {db} from "../Firebase"; //firestore instance
+
 // import { auth } from '../Firebase';
 
 //firestore functions
@@ -55,28 +56,21 @@ export const getActiveCompetition= async ()=>{
 //get the current active competition
 export const getNextCompetition= async ()=>{
 
-//     //getting next month;s competition
-//     const thisDate = new Date();
-//     var startTimestamp = (new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 1)).getTime();
+const allData=[];
 
-//     //snapshot for our users collection
-//     const querySnapshot = await getDocs(collection(db, 'competitions'), where("startDate", "==", startTimestamp));
+    const thisDate = new Date();
+    var startTimestamp = (new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 1));
+    var myTimestamp = Timestamp.fromDate(startTimestamp);
 
-//     var allData=[];
-//     // const date = dateCreated.toDate().toDateString()
+//snapshot for our users collection
+const collectionRef=query(collection(db, "competitions") ,where("startDate", "==", myTimestamp));
+const collectionSnapshot = await getDocs(collectionRef);
 
-//     querySnapshot.forEach((doc)=>{
-//     const compData={
-//         startDate:doc.data().startDate,
-//         endDate:doc.data().endDate,
-//         prize:doc.data().prize,
-//         uid:doc.data().uid,
-//         status:doc.data().status,
-//     }
-
-//     allData=compData;
-// })
-
+collectionSnapshot.forEach((doc)=>{
+    
+    allData.push(doc.data());
+    // console.log(doc.data());
+});
 return allData;
 }
 
@@ -92,10 +86,14 @@ export const settag= (uid, data) =>{
   
 }
 
+export const setPowerup= (uid, data) =>{
+    const userRef = doc(db, 'users', uid);
+    return setDoc(userRef, data, {merge:true});//option to merge and not overrite
+}
+
 export const updateStatus= (uid, data) =>{
     const userRef = doc(db, 'competitions', uid);
     return setDoc(userRef, data, {merge:true});//option to merge and not overrite
-  
 }
 
 export const addParticipant=(data, id)=>{
@@ -103,29 +101,6 @@ export const addParticipant=(data, id)=>{
         return addDoc(collectionRef, data);
    }
 
-
-
-
-// //get all the user documents
-// export const listenToAllProjects= async ()=>{
-//     //return a list of users
-//     const projects=[];
-//     //snapshot for our users collection
-//     const querySnapshot = await getDocs(collection(db, 'projects'));
-
-//     //need to loop through snapshot and get each document's data
-// querySnapshot.forEach((doc)=>{
-//     let project ={...doc.data(), uid:doc.id}
-//     projects.push(project);
-// })
-// return projects;
-// }
-
-// //returns our collection reference that we want to listen for real updates 
-// export const getCollectionListener=()=>{
-//     //returning this reference
-//     return collection(db, "projects");
-// }
 
 export const getAllParticipants=async (id)=>{
 let participants=[];
@@ -138,6 +113,12 @@ collectionSnapshot.forEach((doc)=>{
     // console.log(doc.data());
 });
 return participants;
+}
+
+//returns our collection reference that we want to listen for real updates 
+export const getCollectionListener=(id)=>{
+    //returning this reference
+    return query(collection(db, "competitions/"+id+"/participants") ,orderBy('points', 'asc'));
 }
 
 export const getTagged=async (id)=>{

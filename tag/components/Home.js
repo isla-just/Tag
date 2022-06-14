@@ -65,8 +65,6 @@ export default function Home({navigation}) {
     setComp(activeComp[0]);
     setCompID(activeComp[0].uid);
     setEndDate(activeComp[0].endDate);
-
-    setComp(activeComp);
 }
 
 useEffect(() => {
@@ -106,10 +104,10 @@ useEffect(() => {
     const getCountdown =  ()=>{
         // setting the countdown 
 
-        var hours=0;
-        var minutes =0;
-    var seconds =0;
-    var d=0;
+        let hours=0;
+        let minutes =0;
+        let seconds =0;
+        let d=0;
 
         if(endDate.length!==0){
             console.log("date has been set")
@@ -160,30 +158,6 @@ const getAUser= async ()=>{
     } else {
       console.log("No such document!");
     }
-}
-
-const saveCompetition = async()=>{
-
-    // // setting the start date
-    // var startDate = new Date(); // Now
-    // startDate.setDate(startDate.getDate() + 30); // Set now + 30 days as the new date
-    // // console.log("start"+startDate);
-
-    //     // setting the end date
-    //     var endDate = new Date(); // Now
-    //     endDate.setDate(endDate.getDate() + 60); // Set now + 30 days as the new date
-    //     // console.log("end"+endDate);
-
-
-    // const data = {
-    //     endDate:endDate,
-    //     startDate:startDate,
-    //     prize:"technology",
-    //     status:"inactive",
-    // }
-
-
-    //  await newCompetition(data);
 }
 
     useEffect(()=>{
@@ -313,7 +287,7 @@ const saveCompetition = async()=>{
             //duration of countdown in seconds
             timetoShow={('H', 'M', 'S')}
             //To Do: show completed screen here
-            onFinish={() => alert('The competition is over')}
+            onFinish={() => navigation.navigate("Complete", userData)}
             //on Finish call
             onPress={() => alert('hello')}
             //on Press call
@@ -325,7 +299,7 @@ const saveCompetition = async()=>{
     )}
         </View>
 
-                <TouchableOpacity style={styles.btn2} onPress={saveCompetition}><Text style={styles.btnTxt}>Generate new</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.btn2}  onPress={()=> navigation.navigate("Complete", userData)}><Text style={styles.btnTxt}>Complete</Text></TouchableOpacity>
 
         <Image source={express} style={styles.express} />
 

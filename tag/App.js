@@ -29,6 +29,7 @@ import Waiting from './components/Waiting';
 import PowerupDetail from './components/PowerupDetail';
 import Leaderboard from './components/Leaderboard';
 import Tagged from './components/Tagged';
+import Complete from './components/Complete';
 
 export default function App() {
 
@@ -74,6 +75,7 @@ return unsubscribe;
           <Stack.Screen name="Tagged" component ={Tagged} options={{headerShown:false}}/>
           <Stack.Screen name="Permissions" component ={Permissions} options={{headerShown:false}}/>
           <Stack.Screen name="Tag" component ={Tag} options={{headerShown:false}}/>
+          <Stack.Screen name="Complete" component ={Complete} options={{headerShown:false}}/>
         </>
 
         ):(
