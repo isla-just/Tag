@@ -37,23 +37,45 @@ export const createUserOnRegister=(user, username, apipfp)=>{
 //get the current active competition
 export const getActiveCompetition= async ()=>{
 
+    const allData=[];
+
     //snapshot for our users collection
-    const querySnapshot = await getDocs(collection(db, 'competitions'), where("status", "==", "active"));
+    const collectionRef=query(collection(db, "competitions") ,where("status", "==", "active"));
+    const collectionSnapshot = await getDocs(collectionRef);
 
-    var allData=[];
-    // const date = dateCreated.toDate().toDateString()
+    collectionSnapshot.forEach((doc)=>{
+        
+        allData.push(doc.data());
+        // console.log(doc.data());
+    });
+    return allData;
 
-    querySnapshot.forEach((doc)=>{
-    const compData={
-        startDate:doc.data().startDate,
-        endDate:doc.data().endDate,
-        prize:doc.data().prize,
-        uid:doc.data().uid,
-        status:doc.data().status,
-    }
+}
 
-    allData=compData;
-})
+//get the current active competition
+export const getNextCompetition= async ()=>{
+
+//     //getting next month;s competition
+//     const thisDate = new Date();
+//     var startTimestamp = (new Date(thisDate.getFullYear(), thisDate.getMonth() + 1, 1)).getTime();
+
+//     //snapshot for our users collection
+//     const querySnapshot = await getDocs(collection(db, 'competitions'), where("startDate", "==", startTimestamp));
+
+//     var allData=[];
+//     // const date = dateCreated.toDate().toDateString()
+
+//     querySnapshot.forEach((doc)=>{
+//     const compData={
+//         startDate:doc.data().startDate,
+//         endDate:doc.data().endDate,
+//         prize:doc.data().prize,
+//         uid:doc.data().uid,
+//         status:doc.data().status,
+//     }
+
+//     allData=compData;
+// })
 
 return allData;
 }
@@ -77,15 +99,10 @@ export const updateStatus= (uid, data) =>{
 }
 
 export const addParticipant=(data, id)=>{
-
-        const collectionRef=collection(db,"competitions/"+id+"/participants");
+        const collectionRef=collection(db,"competitions/" + id + "/participants");
         return addDoc(collectionRef, data);
-
    }
 
-   export const newCompetition=(competition)=>{
-    return addDoc(collection(db, 'competitions'), competition);
-}
 
 
 

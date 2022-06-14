@@ -1,11 +1,11 @@
 import React,{useState, useEffect} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert,KeyboardAvoidingView, Keyboard } from 'react-native';
 import logo from '../assets/logo2.png';
-import { getActiveCompetition } from '../services/Database';
+import { getActiveCompetition, getNextCompetition } from '../services/Database';
 import { getAllParticipants } from '../services/Database';
 import { addParticipant } from '../services/Database';
 import { auth } from '../Firebase';
-
+import moment from 'moment';
 import * as Font from 'expo-font';
 
 Font.loadAsync({
@@ -21,28 +21,31 @@ export default function Join({route, navigation}) {
     const avatar=userData.avatar;
     const points=userData.points;
     const username=userData.username;
-    const id=userData.uid;
+    const uid=userData.uid;
+    const [compID, setCompID] = useState("");
     const [comp, setComp]=useState([]);
     const [count, setCount]=useState(0);
+    const [endDate, setEndDate]=useState(Date);
+    const [startDate, setStartDate]=useState(Date);
+    const [canEnter, setCanEnter]=useState(true);
 
     // console.log(userData);
 
     const compDetails = async ()=>{
-        const activeComp = await getActiveCompetition();
-        // console.log(activeComp);
+        const activeComp = await getNextCompetition();
+        console.log(activeComp);
+
+        var end=(activeComp.endDate).toDate();
+        var endFormatted = moment(end).utcOffset('+05:30').format('YYYY-MM-DD');
+        setEndDate(endFormatted);
+
+    var start=(activeComp.startDate).toDate();
+    var startFormatted = moment(start).utcOffset('+05:30').format('YYYY-MM-DD');
+    setStartDate(startFormatted);
+
+    setCompID(activeComp.uid);
+
         setComp(activeComp);
-
-const fetchedDate= activeComp.startDate;
-
-var today=new Date(activeComp.fetchedDate);
-console.log(today);
-
-// var today = new Date();
-// var dd = String(today.getDate()).padStart(2, '0');
-// var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-// var yyyy = today.getFullYear();
-// var today = new Date().getTime();
-
     }
 
 
@@ -53,26 +56,34 @@ console.log(today);
 
         const getCountParticipants = async ()=>{
             const participants = await getAllParticipants(comp.uid);
-
             setCount(participants.length);
+
+            for(var i=0;i<participants.length;i++){
+                console.log(participants[i].uid)
+                if(participants[i].uid!==userData.uid){
+                    setCanEnter(false);
+                    console.log("not entered");
+                }else{
+                    setCanEnter(false);
+                    console.log("already entered");
+                }
+            }
+
+            // if(userData.uid==participants.uid){
+
+            // }
         }
 
         getCountParticipants();
-
         compDetails();
-    },[comp.uid])
 
-    // const fetchAllUsers = async()=>{
-    //     const data = await getAllUsers();
-    //     // console.log(data);
-    //     setUsers(data);
-    //     setIsLoading(false);
-    //   }
+
+    },[comp.uid])
     
     const AddParticipant = async ()=>{
-        addParticipant({avatar, points, username},comp.uid)
-    
-        navigation.navigate("Waiting");
+        await addParticipant(compID, {avatar, points, username, uid})
+        navigation.navigate({ name:'Waiting',
+        params:startDate});
     }
 
   return (
@@ -92,17 +103,26 @@ console.log(today);
                     {/* // pink circle */}
         <View style={styles.pink}>
             <Text style={styles.pink1}>from:</Text>
-            <Text style={styles.pink2}>12 June 2022</Text>
+            <Text style={styles.pink2}>{startDate}</Text>
 
             <Text style={styles.pink3}>to:</Text>
-            <Text style={styles.pink4}>12 July 2022</Text>
+            <Text style={styles.pink4}>{endDate}</Text>
         </View>
 
 
-            {/* // yellow circle */}
-        <TouchableOpacity style={styles.yellow} onPress={AddParticipant}>
-            <Text style={styles.yellow1}>Join game</Text>
-        </TouchableOpacity>
+        { canEnter ?  
+    (
+           <TouchableOpacity style={styles.yellow} onPress={AddParticipant}>
+               <Text style={styles.yellow1}>Join game</Text>
+           </TouchableOpacity>
+
+    ) : (  <> 
+        <View style={styles.yellowDisabled}>
+            <Text style={styles.yellow1Disabled}>Entered</Text>
+        </View>
+          <TouchableOpacity style={styles.btn2} onPress={()=> navigation.goBack()}><Text style={styles.btnTxt}>Back Home</Text></TouchableOpacity>
+          </>    
+    )}
 
         </View>
 
@@ -209,6 +229,15 @@ content:{
         marginTop:-60,
         alignItems: 'center',
         justifyContent:'center'
+    },yellowDisabled:{
+        backgroundColor:"#FECE34",
+        width:400,
+        height:400,
+        borderRadius:400,
+        marginLeft:70,
+        marginTop:-60,
+        alignItems: 'center',
+        justifyContent:'center'
     }, yellow1:{
         fontSize:20,
         width: 200,
@@ -216,6 +245,27 @@ content:{
         fontFamily:'semibold',
         marginLeft:0,
         marginTop:-30,
+        textDecorationLine:"underline"
+
+    },btn2:{
+        width:'100%',
+        padding:20,
+        backgroundColor:'#FFA6BA',
+        borderRadius:100,
+        marginTop:-220,
+    
+    },btnTxt:{
+        color:'#FFFBEB',
+        fontFamily:'semibold',
+        textAlign:'center',
+        fontSize:18
+    }, yellow1Disabled:{
+        fontSize:20,
+        width: 200,
+        color:'#FFFBEB',
+        fontFamily:'semibold',
+        marginLeft:0,
+        marginTop:-80,
         textDecorationLine:"underline"
 
     },

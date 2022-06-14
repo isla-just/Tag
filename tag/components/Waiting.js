@@ -12,12 +12,14 @@ Font.loadAsync({
   'semibold':require('../assets/fonts/MontserratAlternates-SemiBold.ttf'),
 });
 
-export default function Waiting({navigation}) {
+export default function Waiting({route, navigation}) {
+
+  const date=route.params;
 
   return (
     <View style={styles.container}>
           <Image source={logo} style={styles.logo} />
-          <Text style={styles.header}>See ya on the 12th of June!</Text>
+          <Text style={styles.header}>See ya on this date: {date}</Text>
           <Text style={styles.sub}>We will notify you as soon as the games begin</Text>
 
           <TouchableOpacity style={styles.btn} onPress={()=> navigation.replace("Home")}>

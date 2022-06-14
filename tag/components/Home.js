@@ -10,10 +10,8 @@ import leaderboard3 from '../assets/leaderboard3.png';
 import { useFocusEffect } from '@react-navigation/native'
 import {onSnapshot } from 'firebase/firestore'
 
-import { getAllCompetitions } from '../services/Database';
 import { getActiveCompetition } from '../services/Database';
 import { getAllParticipants } from '../services/Database';
-import { newCompetition } from '../services/Database';
 import { getTagged } from '../services/Database';
 import { signOut } from 'firebase/auth';
 import { auth } from '../Firebase';
@@ -36,7 +34,6 @@ Font.loadAsync({
 
 export default function Home({navigation}) {
 
-    const [competitions, setCompetitions]=useState([]);
     const [userData, setUserData]=useState([]);
     const [yourRegion, setYourRegion]=useState([]);
     const [tagRegion, setTagRegion]=useState([]);
@@ -58,16 +55,16 @@ export default function Home({navigation}) {
   const [thirdPts, setThirdPts]=useState(0);
 
   const [comp, setComp]=useState([]);
-  const [endDate, setEndDate]=useState(Date);
+  const [compID, setCompID]=useState("");
+  const [endDate, setEndDate]=useState([]);
   const [totalDuration, setTotalDuration] = useState(0);
 
   //getting the active competition id
   const compDetails = async ()=>{
     const activeComp = await getActiveCompetition();
-    // console.log(activeComp.uid)
-
-    var end=activeComp.endDate;
-    setEndDate(end.toDate());
+    setComp(activeComp[0]);
+    setCompID(activeComp[0].uid);
+    setEndDate(activeComp[0].endDate);
 
     setComp(activeComp);
 }
@@ -75,6 +72,8 @@ export default function Home({navigation}) {
 useEffect(() => {
 
   compDetails();
+
+//   console.log(comp.uid);
 
       //getting the active competition id
       const getParticipants = async ()=>{
@@ -94,33 +93,47 @@ useEffect(() => {
         // setFirstPts(participants.points);
 
         // setPeople(participants);
+
     }
 
     getParticipants();
 
-},[comp.uid])
+},[compID])
 
 useEffect(() => {
-    const getCountdown = async ()=>{
-        //setting the countdown 
-  
-      //   console.log("end date"+endDate);
-  
-          var thisdate = moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
-          var expiryDate = moment(endDate).utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
-  
+
+
+    const getCountdown =  ()=>{
+        // setting the countdown 
+
+        var hours=0;
+        var minutes =0;
+    var seconds =0;
+    var d=0;
+
+        if(endDate.length!==0){
+            console.log("date has been set")
+            console.log(endDate.toDate());
+            var thisdate = moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
+           var expiryDate = moment(endDate.toDate()).utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss');
+
           var diffr = moment.duration(moment(expiryDate).diff(moment(thisdate)));
   
-          var hours = parseInt(diffr.asHours());
-          var minutes = parseInt(diffr.minutes());
-          var seconds = parseInt(diffr.seconds());
-          var d = hours * 60 * 60 + minutes * 60 + seconds;
+           hours = parseInt(diffr.asHours());
+           minutes = parseInt(diffr.minutes());
+           seconds = parseInt(diffr.seconds());
+           d = hours * 60 * 60 + minutes * 60 + seconds;
           //converting in seconds
           setTotalDuration(d);
+          setLoading(false);
+        }else{
+            console.log("date not set")
+        }
     };
 
     getCountdown();
-},[endDate])
+},[compID, endDate])
+
 
     // const [tagged, setTagged]=useState(false);
 
@@ -188,7 +201,7 @@ const saveCompetition = async()=>{
           } catch (error) {
             console.error(error);
           }  finally {
-           setLoading(false);
+        //    setLoading(false);
          }
        
         }
@@ -212,7 +225,7 @@ const saveCompetition = async()=>{
           } catch (error) {
             console.error(error);
           }  finally {
-           setLoading(false);
+        //    setLoading(false);
          }
        
         }
@@ -222,7 +235,6 @@ const saveCompetition = async()=>{
 
       const getTagRegion = async()=>{
         const activeComp = await getTagged();
-        // console.log(activeComp);
         setActive(activeComp);
       }
 
@@ -291,6 +303,11 @@ const saveCompetition = async()=>{
 {/* orange shape */}
         <View style={styles.block}>
             <Text style={styles.block1}>Time left</Text>
+
+            { isLoading ?  
+    (
+     <ActivityIndicator color='#FFFBEB'/> //will render while loading
+    ) : (
             <CountDown
             until={totalDuration}
             //duration of countdown in seconds
@@ -305,6 +322,7 @@ const saveCompetition = async()=>{
             digitTxtStyle={{color: '#FFFFFF'}}
             timeLabelStyle={{color: '#fff', fontWeight: 'bold'}}
             />
+    )}
         </View>
 
                 <TouchableOpacity style={styles.btn2} onPress={saveCompetition}><Text style={styles.btnTxt}>Generate new</Text></TouchableOpacity>
