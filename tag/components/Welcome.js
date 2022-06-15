@@ -51,13 +51,11 @@ const styles = StyleSheet.create({
       },
       header:{
           color:'#fff',
-          fontFamily:'medium',
           fontSize:50,
           marginTop:150
       },
       header2:{
           color:'#fff',
-          fontFamily:'medium',
           fontSize:50,
           marginTop:10,
           marginLeft:40

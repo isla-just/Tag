@@ -181,7 +181,7 @@ export default function Leaderboard({route, navigation}) {
         />
       </View>
 
-        <Text style={styles.place}>{place}</Text>
+        <Text style={styles.place}>{place+1}</Text>
         <Text style={styles.username}>{username}</Text>
         <Text style={styles.score}>{points}pts</Text>
         </View>

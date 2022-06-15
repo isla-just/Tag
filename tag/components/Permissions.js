@@ -16,22 +16,6 @@ Font.loadAsync({
 
 export default function Permissions({navigation}) {
 
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location2 = await Location.getCurrentPositionAsync();
-      setLocation(location2);
-    })();
-  }, []);
-
   // let text = 'Waiting..';
   // if (errorMsg) {
   //   text = errorMsg;
