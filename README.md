@@ -1,35 +1,35 @@
 <!-- PROJECT LOGO -->
 <br />
 
-![GitHub repo size](https://img.shields.io/github/repo-size/isla-just/BloomInventories?color=%23C2C6B1)
-![GitHub watchers](https://img.shields.io/github/watchers/isla-just/BloomInventories?color=%23EDC9B5)
-![GitHub language count](https://img.shields.io/github/languages/count/isla-just/BloomInventories?color=%23EDC9B5)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isla-just/BloomInventories?color=%23EDC9B5)
+![GitHub repo size](https://img.shields.io/github/repo-size/isla-just/Tag?color=%23FB5E1B)
+![GitHub watchers](https://img.shields.io/github/watchers/isla-just/Tag?color=%23FECE34)
+![GitHub language count](https://img.shields.io/github/languages/count/isla-just/Tag?color=%23F583B4)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isla-just/Tag?color=%236C97FB)
 [![LinkedIn][linkedin-shield]][linkedin-url]
 [![Instagram][instagram-shield]][instagram-url]
 
-<h6 align="center">Isla Just 200080 IDV 301</h6>
+<h6 align="center">Isla Just 200080 IDV 302</h6>
 <p align="center">
 </br>
    
    <p align="center">
-  <a href="https://github.com/isla-just/BloomInventories ">
-    <img src="ReadMeImg/logo.png" alt="Logo" width="240" height="">
+  <a href="https://github.com/isla-just/Tag ">
+    <img src="ReadMeImg/logo.png" alt="Logo" width="180" height="">
   </a>
   </p>
   
-  <h3 align="center">Bloom Inventories</h3>
+  <h3 align="center">This is Tag</h3>
 
   <p align="center">
-    employee-centred florist inventory management portal<br>
-      <a href="https://github.com/isla-just/BloomInventories"><strong>Explore the docs »</strong></a>
+    A massive game of tag!<br>
+      <a href="https://github.com/isla-just/Tag"><strong>Explore the docs »</strong></a>
       <br />
       <br />
-      <a href="ReadMeImg/IslaJust_200080_DV300_T1_demo.mp4">View Demo</a>
+      <a href="ReadMeImg/IslaJust_200080_DV300_T2_demo.mp4">View Demo</a>
        ·
-       <a href="https://github.com/isla-just/BloomInventories/issues">Report Bug</a>
+       <a href="https://github.com/isla-just/Tag/issues">Report Bug</a>
        ·
-       <a href="https://github.com/isla-just/BloomInventories/issues">Request Feature</a>
+       <a href="https://github.com/isla-just/Tag/issues">Request Feature</a>
    </p>
 
 <!-- TABLE OF CONTENTS -->
@@ -72,18 +72,17 @@
 
 ### Project Description
 
-Bloom Inventories keeps track of bouquets and flowers so that employees can easily manage all three Bloom Inventory locations. 
+A massive worldwide game of tag which is hosted monthly and uses your geolocation to find players nearby. 
 
-Grocery flowers are becoming more impersonal and are also insanely expensive - they also die quickly because they aren't fresh. Bloom Inventories takes an employee-centred design approach to allow employees to keep track of flowers and bouquets. Bloom Inventories also does weekly bouquets where people can subscribe and get bouquets sent to their homes every week.
+Every month there is a huge tag competition hosted on the app. You have to enter as a player and then pass the tag on if you are tagged - this works by finding other players nearby. Climb the leaderboard and you might just win a crown
 
 ### Built With
 
-* [ASP.NET](https://dotnet.microsoft.com/en-us/apps/aspnet)
-* [mySQL database](https://www.mysql.com/)
-* [C# language](https://docs.microsoft.com/en-us/dotnet/csharp/)
-* [Visual Studio](https://visualstudio.microsoft.com/)
+* [Firebase](https://firebase.google.com/)
+* [React Native](https://reactnative.dev/)
+* [Expo](https://expo.dev/)
+* [Visual Studio Code](https://code.visualstudio.com/)
 * [GitHub](https://github.com/)
-* [Mamp](https://www.mamp.info/en/windows/)
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -92,76 +91,76 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-For development, the latest version (ideally the 2022 preview) of Visual Studio is required - install it with .NET. The latest version can be downloaded from [Visual Studio Download](https://visualstudio.microsoft.com/downloads/)
+For development, I used Visual Studio Code [Visual Studio Code Download](https://code.visualstudio.com/). And I used ExpoGo to text the app on my phone [ExpoGo Download](https://expo.dev/client)
+
+
 
 ### Installation
  
 1. Clone the repo
 ```sh
-git clone https://github.com/isla-just/BloomInventories.git
+git clone https://github.com/isla-just/Tag.git
 ```
-2. Start your MAMP server which can be downloaded  [here](https://www.mamp.info/en/windows/)
 
-3. Open the solution in Visual Visual Studio
+2. Open the solution in Visual Studio Code
 
-4. Find the migrations folder in the directory and import the bloom.sql file using phpmyadmin
-
-5. Navigate to the Services folder and the Database.cs file and change the database connection string 
+3. Install all dependencies using Visual Studio
 ```sh
-	private static string serverConfiguration = @"server=localhost;port=8889 userid=root;password=root;database=bloom";
+npm install
 ```
-6. if neccessary, install respective NuGet Packages
-* XAct.Core.PCL - SHA1 encryption
-* MySQL.Data - sql
 
-7. Build Bloom Inventories!
+4. Run expo start in your terminal 
+
+5. then download the ExpoGo app on your mobile device and scan the QR code
 
 <!-- FEATURES AND FUNCTIONALITY-->
 ## Features and Functionality
 
 ### Features
 
-### Contextual home page
+### Login and signup
 
 ![image2][image2]
 
-There is a dynamic slider on the home page as well as a dynamic flower gallery. There is a location section that shows a slideshow of locations. There is also a subscription form that allows you to subscribe for weekly flowers - this includes database verification testing if the email has already been taken as well as user feedback. 
+Simple login and signup forms allowing you to be onboarded quickly and easily. There is also a preloader, welcome, login, signup and permission screen. This onboarding experience is quick and easy and has been implemented using simple forms and firebase authentication for the backend
 
-### Verify Bloom Inventory employee
+### Tag you're it!
 
 ![image3][image3]
 
-Unconventional verification has been achived through a popup on the homepage that randomly generates a flower from the database and shows an image of it. The employee must name the flower correcly to move forward. the flower name has been hashed using the cryptographic hash function and there is also security implemented on each employee accessible page
+If the user has been tagged by another player, this screen will pop up in real time. You are given a dynamic map with all the other player's locations on it - the markers are interactive
 
-### Dashboard page
+### Home page
 
 ![image4][image4]
 
-the dashboard page provides users with an overview of seasonal and low stock flowers based on their location. They are also shown the bouquet of the week where they can generate a new random bouquet. Counters for the location's bouquets and weekly bouquet subscribers are also shown.   
+On the home page, you are given the game countdown and are shown the region of the tag currently - but you never know who has it. You can view the top 3 players and view your player stats like the amount of times you have been tagged. 
 
-### Inventory management
+### Entering and viewing competitions
 
 ![image5][image5]
 
-Employees can visualise flowers and packing materials for each location as well as their quantities. Employees can update materials and are given feedback. They can also filter based on category. Location filtering and inventory management can also be done on this page.
+You can view the dynamic leaderboard which updates in real-time. You can also join next month's competition from the home page and view how many people are waiting to play and the dates
 
-### Create bouquets
+### Completed competition
 
 ![image6][image6]
 
-Employees can see all bouquets in the selected location and they can further filter results according to category as well as change the location. They can see which bouquets can be created and are given a popup walkthrough to craft the bouquet. Once crafted, it is added to the inventory and respective flower quantities are updated accordingly. 
+There is a cloud function that runs at the begining of each month to handle this functionality. Once the cloud function has run and the countdown on the home page has run out, this page will pop up. You can view your place in the competition and if you come first you even win a funky crown.
 
 ### Functionality
 
-* `MVC` a model view controller architecture has been used with RazorPages to embed c# code in our html.
-* `ASP form handlers` have been used to handle the submits of all the dynamic forms throughout the website.
-* `local storage` has been used to check if the employee has been verified on every page.
-* `password hashing` SHA1 hashing has been used to hash the flower name in the database.
-* `OOP principles` used to model objects in classes.
-* `database relationships` modelling complex data structures in SQL.
-* `User experience` frontend refinements to cater for good user experience. 
-* `UQL queries` storing session data to output data dynamically on the frontend. 
-* `Crafting bouquets` and updating respective flower quantities accordingly. 
+* `Firebase authentication` allowing for safe and secure login and register of users - also allowing the user to log out securely
+* `Location Monitoring` monitoring user locations and plotting them on a map
+* `Tagging functionality` interactive markers allowing you to tag someone closeby
+* `Game countdown` using react countdown 
+* `Finding tag region` using the geonames API 
+* `Entering next month's competition` where you are shown the dates for the next competition and how many people have already entered
+* `Dynamic leaderboard` for the competition as well as showing the top three players on the leaderboard and home page
+* `Player statistics` shown on the home page. You are shown a a tag counter, your points and your region
+* `Cloud function` generating competitions and updating the statuses of current and past competitions
+* `Winning crowns` if you place first on the leaderboard
+* `Boring Avatar` API that randomly assigns every user a funky avatar
 
 <!-- CONCEPT PROCESS -->
 ## Concept Process
@@ -170,16 +169,11 @@ The `Conceptual Process` is the set of actions, activities and research that was
 
 ### ERD
 
-![image9][image9]
-
-### Wireframes
-
-![image11][image11]
-![image12][image12]
+![image8][image8]
 
 ### User-flow
 
-![image10][image10]
+![image7][image7]
 
 <!-- DEVELOPMENT PROCESS -->
 ## Development Process
@@ -187,43 +181,49 @@ The `Conceptual Process` is the set of actions, activities and research that was
 
 The `Development Process` is the technical implementations and functionality done in the backend of the application.
 
-![image13][image13]
-
 ### Implementation Process
 
-#### Frontend layout and oject modelling
-I started by designing the frontend of my website using my razorpages as well as regular html and css. I also started implementing some OOP basics in my project so I could start modelling objects
+### Frontend development and project setup
+I set up my project using Expo and started coding my frontend components. I also set up my firebase and started implementing navigation 
 
-#### database linking and dynamic data
-Then I did my database link and started modelling my data in my database. I also had to populate my database with all the flowers and bouquets
+### Login and signup - firebase authentication and database setup
+After playing around with forms, I linked my firebase and implemented authentication. I also created my DB structure 
 
-#### CRUD and crafting functionality
-this was the main functionality of this project. All handling as done using asp page handlers on form submits, calling data from the model and the database class
+### Tagging functionality
+Managing map permissions on all platforms. I used geoqueries and geohashing to store the locations in the database
 
-#### UX, verification, security and frontend refinements
-next I started making my project dynamic with jquery. I also added the unconventional verification and flower hashing. I implemented the security on each page
+### Entering competitions and dynamic data
+Outputting data dynamically on the frontend and entering the next competition functionality
+
+### Create competition cloud functions
+Writing a cloud function that does 3 things at the beginning of each month Completed competition functionality
+
+![image9][image9]
 
 #### Highlights
 
-* I really enjoyed being creative with this theme. Once I got the hang of OOP and C#, I ended up really enjoying it
+* I really enjoyed working on this app because of the concept I picked. I found working with Expo and React Native very efficient and overall enjoyable. 
 
 #### Challenges
 
-* Popups and feedback also proved to be a challenge because of page refreshes after form submits
-* my frontend also took a little longer than expected because I had to rebuild my project after every minor change
+* The locations and tagging aspect of this project with geoqueries were very tricky. 
+* The timing aspect of this project using cloud functions was also one of my biggest challenges but I am so pleased that I got it working
 
 
 #### Future Implementation
 
-* A payment portal where you can sell bouquets implementing the Snapscan api
-* Bouquet of the week functionality timer and automation
+* Push notifications when a competition is complete
+* customised avatars
+* winning powerups once a week - getting special skills to help you in the competition
+gifts functionality to send other players gifts
 
 <!-- MOCKUPS -->
 ## Final Outcome
 
 ### Mockups
 
-![image15][image15]
+![image10][image10]
+![image11][image11]
 
 <!-- VIDEO DEMONSTRATION -->
 ## Video Demonstration
@@ -242,7 +242,7 @@ To see the promotional video, click below:
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/isla-just/BloomInventories/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/isla-just/Tag/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -269,18 +269,30 @@ Distributed under the MIT License. See `LICENSE` for more information.\
 ## Contact
 
 * **Isla Just** - [@byislajust](https://www.instagram.com/byislajust/) - isla@just.co.za
-* **Project Link** - https://github.com/isla-just/BloomInventories
+* **Project Link** - https://github.com/isla-just/Tag
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* [Visual Studio Documenation](https://docs.microsoft.com/en-us/visualstudio/windows/?view=vs-2019)
-* [StackOverflow](https://stackoverflow.com/)
+* Design inspiration from headspace [Headspace](https://www.headspace.com/)
+* Avatars from [Boring Avatars](https://boringavatars.com/)
 
-mockups:
+### Documentation 
+* https://docs.expo.dev/versions/latest/sdk/location/
+* https://reactnavigation.org/
+* https://firebase.google.com/docs/reference/android/com/google/firebase/firestore/GeoPoint
+* https://firebase.google.com/docs/firestore/solutions/geoqueries#web_1
+* https://firebase.google.com/docs/functions/schedule-functions
+
+### Mockups
 * https://originalmockups.com/mockups/free-mockups
 * https://freedesignresources.net/category/free-mockups/?_paged=6
 * https://www.anthonyboyd.graphics/mockups/28/
+
+### Tutorials
+* https://instamobile.io/react-native-tutorials/uber-react-native-geolocation/
+* https://www.freecodecamp.org/news/how-to-schedule-a-task-with-firebase-cloud-functions/
+* https://www.youtube.com/watch?v=D4wgrgb24o0
 
 * Peers: Pieter Venter https://github.com/Pieter-stack and Hansin Prema
 * lecturer: Armand Pretorius https://github.com/ArmandPret
@@ -292,19 +304,15 @@ mockups:
 [instagram-url]: https://www.instagram.com/dylandasilva.designs/
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[image1]: ReadMeImg/devmockup3.png
-[image2]: ReadMeImg/15.png
-[image3]: ReadMeImg/16.png
-[image4]: ReadMeImg/17.png
-[image5]: ReadMeImg/18.png
-[image6]: ReadMeImg/19.png
-[image9]: ReadMeImg/8.png
-[image10]: ReadMeImg/9.png
-[image11]: ReadMeImg/10.png
-[image12]: ReadMeImg/11.png
-[image13]: ReadMeImg/14.png
-[image14]: ReadMeImg/22.png
-
-[image15]: ReadMeImg/devmockup1.png
-
- 
+[logo]: ReadMeImg/logo.png
+[image1]: ReadMeImg/image1.png
+[image2]: ReadMeImg/image2.png
+[image3]: ReadMeImg/image3.png
+[image4]: ReadMeImg/image4.png
+[image5]: ReadMeImg/image5.png
+[image6]: ReadMeImg/image6.png
+[image7]: ReadMeImg/image7.png
+[image8]: ReadMeImg/image8.png
+[image9]: ReadMeImg/image9.png
+[image10]: ReadMeImg/image10.png
+[image11]: ReadMeImg/image11.png
