@@ -5,6 +5,10 @@ import arrow from '../assets/arrow.png';
 
 import * as Location from 'expo-location';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 import * as Font from 'expo-font';
 
 Font.loadAsync({

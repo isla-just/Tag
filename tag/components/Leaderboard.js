@@ -13,6 +13,10 @@ import leaderboard2 from '../assets/leaderboard2.png';
 import leaderboard3 from '../assets/leaderboard3.png';
 import Avatar from 'react-native-boring-avatars';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 import * as Font from 'expo-font';
 
 Font.loadAsync({

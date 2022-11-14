@@ -11,6 +11,10 @@ import {db} from "../Firebase";
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where } from "firebase/firestore";
 
 
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
+
 const geofire = require('geofire-common');
 
 

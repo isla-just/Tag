@@ -8,6 +8,10 @@ import nom from '../assets/nom.png'
 import logo from '../assets/logo.png';
 // import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 import * as Font from 'expo-font';
 
 Font.loadAsync({

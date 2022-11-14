@@ -16,6 +16,10 @@ import { updateTag } from '../services/Database';
 import { settag } from '../services/Database';
 import { auth } from '../Firebase';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 Font.loadAsync({
   // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
   // 'regular':require('../assets/fonts/MontserratAlternates-Regular.ttf'),

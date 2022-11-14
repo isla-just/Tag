@@ -1,12 +1,13 @@
 <!-- PROJECT LOGO -->
 <br />
 
-![GitHub repo size](https://img.shields.io/github/repo-size/isla-just/Tag?color=%23FB5E1B)
-![GitHub watchers](https://img.shields.io/github/watchers/isla-just/Tag?color=%23FECE34)
-![GitHub language count](https://img.shields.io/github/languages/count/isla-just/Tag?color=%23F583B4)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isla-just/Tag?color=%236C97FB)
+![GitHub repo size](https://img.shields.io/github/repo-size/isla-just/BloomInventories?color=%23FB5E1B)
+![GitHub watchers](https://img.shields.io/github/watchers/isla-just/BloomInventories?color=%23FECE34)
+![GitHub language count](https://img.shields.io/github/languages/count/isla-just/BloomInventories?color=%23F583B4)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/isla-just/BloomInventories?color=%236C97FB)
 [![LinkedIn][linkedin-shield]][linkedin-url]
 [![Instagram][instagram-shield]][instagram-url]
+
 
 <h6 align="center">Isla Just 200080 IDV 302</h6>
 <p align="center">
@@ -25,7 +26,7 @@
       <a href="https://github.com/isla-just/Tag"><strong>Explore the docs »</strong></a>
       <br />
       <br />
-      <a href="ReadMeImg/IslaJust_200080_DV300_T2_demo.mp4">View Demo</a>
+      <a href="https://drive.google.com/file/d/1deRish0cNObeLFc7iwwodsTuOQ7Glfhg/view?usp=sharing">View Demo</a>
        ·
        <a href="https://github.com/isla-just/Tag/issues">Report Bug</a>
        ·
@@ -230,14 +231,14 @@ gifts functionality to send other players gifts
 
 To see a run through of the application, click below:
 
-[View Demonstration]()
+[View Demonstration](https://drive.google.com/file/d/1deRish0cNObeLFc7iwwodsTuOQ7Glfhg/view?usp=sharing)
 
 <!-- PROMO VIDEO -->
 ## Promotional Video
 
 To see the promotional video, click below:
 
-[View Promotional Video]()
+[View Promotional Video](https://youtu.be/bP1KuMEj_iA)
 
 <!-- ROADMAP -->
 ## Roadmap

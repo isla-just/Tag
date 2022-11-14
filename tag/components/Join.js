@@ -10,6 +10,10 @@ import * as Font from 'expo-font';
 import { useFocusEffect } from '@react-navigation/native'
 import { doc, onSnapshot } from 'firebase/firestore'
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 Font.loadAsync({
     // 'light':require('../assets/fonts/MontserratAlternates-Light.ttf'),
     // 'regular':require('../assets/fonts/MontserratAlternates-Regular.ttf'),

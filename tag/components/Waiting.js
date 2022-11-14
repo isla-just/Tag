@@ -3,6 +3,10 @@ import { StyleSheet, Platform, Text, View, Image, TouchableOpacity } from 'react
 import logo from '../assets/logo.png';
 import arrow from '../assets/arrow.png';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 import * as Font from 'expo-font';
 
 Font.loadAsync({

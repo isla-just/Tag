@@ -6,6 +6,10 @@ import logo from '../assets/logo2.png';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../Firebase';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 import * as Font from 'expo-font';
 
 Font.loadAsync({

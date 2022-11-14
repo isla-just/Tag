@@ -18,6 +18,9 @@ import { auth } from '../Firebase';
 import { doc, setDoc, collection, query, orderBy, startAt, endAt, getDocs, where, getDoc } from "firebase/firestore";
 import {db} from "../Firebase";
 
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 //formatting dates
 import CountDown from 'react-native-countdown-component';
 import moment from 'moment';
@@ -130,7 +133,7 @@ useEffect(() => {
     };
 
     getCountdown();
-},[compID, endDate])
+},[userData.uid, endDate])
 
 
     // const [tagged, setTagged]=useState(false);
@@ -299,7 +302,7 @@ const getAUser= async ()=>{
     )}
         </View>
 
-                <TouchableOpacity style={styles.btn2}  onPress={()=> navigation.navigate("Complete", userData)}><Text style={styles.btnTxt}>Complete</Text></TouchableOpacity>
+                {/* <TouchableOpacity style={styles.btn2}  onPress={()=> navigation.navigate("Complete", userData)}><Text style={styles.btnTxt}>Complete</Text></TouchableOpacity> */}
 
         <Image source={express} style={styles.express} />
 

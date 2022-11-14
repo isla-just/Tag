@@ -2,6 +2,10 @@ import React,{useState} from 'react';
 import { StyleSheet, Platform, Text, View, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import logo from '../assets/logo2.png';
 
+
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();//Ignore all log notifications
+
 //firebase
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../Firebase';
